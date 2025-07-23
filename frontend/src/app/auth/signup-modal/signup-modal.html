@@ -1,0 +1,92 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create Account</h2>
+      <button class="close-btn" (click)="onClose()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="auth-form">
+        <!-- User Type Selection -->
+        <div class="user-type-section">
+          <h3>I want to join as:</h3>
+          <div class="toggle-container">
+            <div class="toggle-slider" [class.tutor-selected]="userData.userType === 'tutor'">
+              <button 
+                class="toggle-option"
+                [class.active]="userData.userType === 'student'"
+                (click)="userData.userType = 'student'"
+              >
+                <span class="icon">👨‍🎓</span>
+                <span class="label">Student</span>
+              </button>
+              <button 
+                class="toggle-option"
+                [class.active]="userData.userType === 'tutor'"
+                (click)="userData.userType = 'tutor'"
+              >
+                <span class="icon">👨‍🏫</span>
+                <span class="label">Tutor</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="form-section">
+          <div class="form-group">
+            <label for="name">Full Name</label>
+            <input 
+              type="text" 
+              id="name"
+              [(ngModel)]="userData.name"
+              placeholder="Enter your full name"
+              [disabled]="isLoading"
+              class="form-input"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+              type="email" 
+              id="email"
+              [(ngModel)]="userData.email"
+              placeholder="Enter your email"
+              [disabled]="isLoading"
+              class="form-input"
+            >
+          </div>
+
+          <button 
+            class="btn-primary"
+            (click)="onSignup()"
+            [disabled]="isLoading || !userData.name || !userData.email"
+          >
+            <span *ngIf="isLoading">Creating Account...</span>
+            <span *ngIf="!isLoading">Create Account</span>
+          </button>
+        </div>
+
+        <!-- Messages -->
+        <div class="message-section">
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+          </div>
+          <div class="success-message" *ngIf="successMessage">
+            {{ successMessage }}
+          </div>
+        </div>
+
+        <!-- Switch to Login -->
+        <div class="switch-section">
+          <p>Already have an account? 
+            <button class="btn-link" (click)="onSwitchToLogin()">
+              Log in here
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

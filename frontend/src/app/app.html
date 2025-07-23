@@ -1,0 +1,454 @@
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
+<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
+<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
+<!-- * * * * * * * to get started with your project! * * * * * * * -->
+<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+
+<style>
+  :host {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+      "Segoe UI Symbol";
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: white;
+    font-family: inherit;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    gap: 0.5rem;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    height: 48px;
+    width: 120px;
+    margin-right: 3.5rem;
+  }
+
+  .user-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .user-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .user-button:active {
+    transform: translateY(0);
+  }
+
+  .person-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .user-emoji {
+    font-size: 1rem;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 150px;
+    z-index: 1001;
+    margin-top: 0.5rem;
+    border: 1px solid #e5e7eb;
+  }
+
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+    color: #374151;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+  }
+
+  .dropdown-item:hover {
+    background-color: #f3f4f6;
+  }
+
+  .dropdown-item.signout {
+    color: #dc2626;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .dropdown-item.signout:hover {
+    background-color: #fee2e2;
+  }
+
+  .main-content {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    padding-top: 6rem;
+    padding-bottom: 8rem;
+  }
+
+  .welcome-text {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    letter-spacing: -0.025em;
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cta-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+  }
+
+  .primary-button {
+    background: linear-gradient(135deg, #8b5cf6, #a855f7);
+    color: white;
+  }
+
+  .primary-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+
+  .secondary-button {
+    background: white;
+    color: #8b5cf6;
+    border: 2px solid #8b5cf6;
+  }
+
+  .secondary-button:hover {
+    background: #8b5cf6;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .nav-button {
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-left: 0;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+    box-shadow: 0 1px 4px rgba(139, 92, 246, 0.08);
+    outline: none;
+    display: flex;
+    align-items: center;
+    height: 38px;
+  }
+  .nav-button:hover, .nav-button:focus {
+    background: #fff;
+    color: #a855f7;
+    border: 2px solid #a855f7;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.18);
+    z-index: 1;
+  }
+
+  .nav-button-standout {
+    background: linear-gradient(90deg, #a855f7 0%, #8b5cf6 100%);
+    color: #fff;
+    border: 1px solid #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.18);
+    transition: background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s;
+  }
+  .nav-button-standout:hover, .nav-button-standout:focus {
+    background: #fff;
+    color: #a855f7;
+    border: 2px solid #a855f7;
+    box-shadow: 0 6px 24px rgba(139, 92, 246, 0.22);
+    z-index: 2;
+  }
+
+  .nav-buttons-group {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .nav-buttons-group > button, .nav-buttons-group > .appearance-alt-button {
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 25px 25px 25px 25px;
+  }
+  .nav-buttons-group > button:not(:last-child) {
+    border-right: none;
+  }
+  .nav-buttons-group > button {
+    /* Remove any default margin between buttons */
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .header {
+      padding: 1rem;
+    }
+
+    .welcome-text {
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      font-size: 1.125rem;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta-button {
+      width: 100%;
+      max-width: 300px;
+    }
+  }
+
+  .user-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .main-content {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+  }
+
+  /* Icon circle button styles */
+  .icon-circle-button {
+    background: #8b5cf6;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0;
+    transition: background 0.2s, box-shadow 0.2s, border 0.2s;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.16);
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+  }
+  .calendar-icon-btn {
+    background: #7c3aed;
+  }
+  .calendar-img {
+    width: 12px;
+    height: 12px;
+  }
+  .chat-icon-btn {
+    background: #7c3aed;
+    margin-right: 1.5rem;
+    margin-left: 0.5rem;
+  }
+  .icon-circle-button:hover, .icon-circle-button:focus {
+    background: #8b5cf6;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.18);
+  }
+  .icon-circle-button .icon-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+  }
+  .icon-circle-button .chat-icon-img {
+    width: 38px;
+    height: 38px;
+  }
+  .icon-circle-button .icon-img.calendar-img {
+    width: 36px;
+    height: 36px;
+  }
+  .red-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d32f2f;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+</style>
+
+<ng-container *ngIf="isAuthLoaded$ | async">
+  <header class="header">
+    <a [routerLink]="['/']" style="text-decoration: none;">
+      <div class="logo" style="height: 64px; width: 120px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <img src="/mytutor-logo.png" alt="MyTutor Logo" style="height: 100%; width: 100%; object-fit: cover; object-position: center; display: block;" />
+      </div>
+    </a>
+    <div class="nav-buttons-group">
+      <button class="nav-button nav-button-standout" type="button" [routerLink]="['/appearance']">Appearance</button>
+      <button class="nav-button nav-button-standout" type="button" [routerLink]="['/past']">Sessions</button>
+      <a class="nav-button nav-button-standout" role="button" tabindex="0" style="text-decoration: none;"
+        [routerLink]="[(currentUser$ | async)?.userType === 'tutor' ? '/offerings' : '/explore']">
+        <ng-container *ngIf="(currentUser$ | async)?.userType === 'tutor'">Offerings</ng-container>
+        <ng-container *ngIf="(currentUser$ | async)?.userType === 'student' || !(currentUser$ | async)">Explore</ng-container>
+      </a>
+    </div>
+    <div class="user-section">
+      <!-- Join Button -->
+      <button *ngIf="hasOngoingSession()" class="join-session-btn" (click)="joinSession()" style="margin-right: 0.5rem; background: #fee2e2; color: #b91c1c; border: none; border-radius: 25px; display: flex; align-items: center; font-weight: 600; font-size: 1rem; padding: 0.4rem 1.1rem 0.4rem 0.9rem; gap: 0.4rem; box-shadow: 0 2px 8px rgba(239,68,68,0.10); position: relative;">
+        <span class="camera-icon" style="display: inline-block; width: 1.2em; height: 1.2em; margin-right: 0.2em;">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.2em; height: 1.2em; display: block;"><path stroke-linecap="round" stroke-linejoin="round" d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
+        </span>
+        Join
+        <span class="red-dot"></span>
+      </button>
+      <!-- Calendar Button -->
+      <button class="icon-circle-button calendar-icon-btn" title="Calendar" [routerLink]="['/calendar']">
+        <img src="/calenderi.png" alt="Calendar" class="icon-img calendar-img" />
+      </button>
+      <!-- Chat Button -->
+      <button class="icon-circle-button chat-icon-btn" title="Chat" (click)="openChat()">
+        <img src="/messagei.png" alt="Chat" class="icon-img chat-icon-img" />
+      </button>
+      <!-- Existing user button -->
+      <button class="user-button" (click)="onUserButtonClick()">
+        <ng-container *ngIf="currentUser$ | async as user; else showIcon">
+          <span class="user-emoji" *ngIf="user.userType === 'student'">👨‍🎓</span>
+          <span class="user-emoji" *ngIf="user.userType === 'tutor'">👨‍🏫</span>
+          {{ user.name }}
+        </ng-container>
+        <ng-template #showIcon>
+          <svg class="person-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+          Log in
+        </ng-template>
+      </button>
+      <div class="dropdown-menu" *ngIf="showDropdown && (currentUser$ | async)">
+        <button class="dropdown-item signout" (click)="signOut()">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Login Modal -->
+  <app-login-modal 
+    *ngIf="showLoginModal"
+    (closeModal)="closeLoginModal()"
+    (switchToSignup)="switchToSignup()">
+  </app-login-modal>
+
+  <!-- Signup Modal -->
+  <app-signup-modal 
+    *ngIf="showSignupModal"
+    (closeModal)="closeSignupModal()"
+    (switchToLogin)="switchToLogin()">
+  </app-signup-modal>
+
+  <app-session-warning-popup *ngIf="showSessionWarning && sessionWarningMessage" 
+    [message]="sessionWarningMessage" (closed)="closeSessionWarning()">
+  </app-session-warning-popup>
+
+  <main class="main-content" style="position: relative; min-height: 100vh; width: 100vw;">
+    <ng-container *ngIf="router.url === '/'">
+      <div style="position: absolute; inset: 0; z-index: 0; background: url('/background.jpg') center top / cover no-repeat;"></div>
+      <div style="position: absolute; inset: 0; z-index: 1; background: rgba(255,255,255,0.15); pointer-events: none;"></div>
+      <div style="position: relative; z-index: 2;">
+        <router-outlet></router-outlet>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="router.url !== '/'">
+      <router-outlet></router-outlet>
+    </ng-container>
+  </main>
+  <app-footer></app-footer>
+  <app-chat-popup></app-chat-popup>
+</ng-container>
+<!-- Optionally, add a loading spinner here if you want -->

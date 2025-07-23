@@ -1,0 +1,226 @@
+<div class="header-with-separator">
+  <div class="header-title">
+    <h1>My Offerings</h1>
+  </div>
+  <div class="header-actions">
+    <!-- Removed search - moved to toolbar -->
+  </div>
+</div>
+
+<div class="offerings-cards-container">
+  <div class="offerings-toolbar">
+    <div class="toolbar-controls">
+      <input type="text" class="lesson-search" placeholder="Search offerings..." [(ngModel)]="searchTerm" (input)="filterOfferings()" />
+      <div class="sort-dropdown-container" [class.open]="showSortDropdown">
+        <div class="sort-dropdown-trigger" (click)="showSortDropdown = !showSortDropdown">
+          <span>{{ getSortDisplayText() }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="sort-dropdown-menu" *ngIf="showSortDropdown">
+          <div class="sort-dropdown-option" (click)="setSort('enrolled-asc')">Enrolled ↑</div>
+          <div class="sort-dropdown-option" (click)="setSort('enrolled-desc')">Enrolled ↓</div>
+        </div>
+      </div>
+      
+      <button class="add-offering-btn" (click)="openCreateModal()">
+        <span class="add-icon">+</span>
+        Add Offering
+      </button>
+    </div>
+  </div>
+
+  <div class="offerings-list-container">
+    <div class="offerings-list" *ngIf="(offerings$ | async) && (offerings$ | async)!.length > 0">
+      <div class="offering-item" *ngFor="let offering of offerings$ | async">
+        <div class="offering-main-info">
+          <div class="offering-title clickable" (click)="onLessonNameClick(offering)">{{ offering.lesson.name }}</div>
+        </div>
+        
+        <div class="offering-meta">
+          <div class="offering-subject">{{ offering.lesson.subject }} {{ getSubjectEmoji(offering.lesson.subject) }}</div>
+          <div class="offering-capacity">
+            <span class="student-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+            </span>
+            <span>{{ offering.enrolledCount }} / {{ offering.maxStudents === 0 ? '∞' : offering.maxStudents }}</span>
+          </div>
+          <div class="offering-duration">{{ formatDuration(offering.duration) }}</div>
+          <div class="offering-price">{{ formatPrice(offering.price) }}</div>
+          <button class="schedule-btn" (click)="openScheduleModal(offering)">Schedule</button>
+        </div>
+        
+        <div class="offering-actions">
+          <button class="delete-btn" (click)="openDeleteModal(offering)" title="Delete Offering">×</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-center-content" *ngIf="(offerings$ | async) && (offerings$ | async)!.length === 0">
+      <div class="empty-title-black">No Offerings Found</div>
+      <p class="empty-desc-grey">Start by creating your first offering to make your lessons available for students.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Create Offering Modal -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create Offering</h2>
+      <button class="close-btn" (click)="closeCreateModal()">×</button>
+    </div>
+    
+    <div class="popup-content">
+      <div class="field lesson-selection-field">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.2rem;">
+          <label class="form-label">Select Lesson</label>
+          <button class="manage-lessons-btn" (click)="navigateToLessons()">Manage Lessons</button>
+        </div>
+        <div class="dropdown-container">
+          <div class="dropdown-trigger" (click)="showLessonDropdown = !showLessonDropdown" [class.error]="showErrors && !offeringForm.lessonId">
+            <span *ngIf="!offeringForm.lessonId" class="placeholder">Choose a lesson...</span>
+            <span *ngIf="offeringForm.lessonId" class="selected-subject">
+              {{ getLessonDisplayName(offeringForm.lessonId) }}
+            </span>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div class="dropdown-menu" *ngIf="showLessonDropdown">
+            <div class="dropdown-options">
+              <div class="dropdown-option" *ngFor="let lesson of filteredLessons" (click)="selectLesson(lesson.id)">
+                {{ lesson.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <ng-container *ngIf="lessons$ | async as lessons">
+          <div class="no-lessons-message" *ngIf="lessons.length === 0">
+            No lessons found. Please add a lesson.
+          </div>
+        </ng-container>
+      </div>
+      
+      <div class="field price-field">
+        <label class="form-label">Price ($)</label>
+        <input type="number" [(ngModel)]="offeringForm.price" class="form-input" placeholder="Free if blank" min="0" step="0.01" [class.error]="showErrors && offeringForm.price !== '' && !isValidPrice(offeringForm.price)">
+      </div>
+      
+      <div class="field duration-field">
+        <label class="form-label">Duration</label>
+        <div class="dropdown-container">
+          <div class="dropdown-trigger" (click)="showDurationDropdown = !showDurationDropdown">
+            <span *ngIf="!offeringForm.duration" class="placeholder">Select Duration</span>
+            <span *ngIf="offeringForm.duration" class="selected-subject">{{ getDurationDisplayText() }}</span>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div class="dropdown-menu" *ngIf="showDurationDropdown">
+            <div class="dropdown-options">
+              <div class="dropdown-option" *ngFor="let duration of durations" (click)="setDuration(duration); showDurationDropdown = false;">
+                {{ duration }} minutes
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="field available-times-field" style="grid-column: 1 / 5;">
+        <label class="form-label">Available Times (<span class="count-number">{{ getSelectedTimesCount() }}</span> selected)</label>
+        <div class="weekly-calendar">
+
+          <div class="calendar-header">
+            <div class="time-column-header">Time</div>
+            <div class="day-header" *ngFor="let day of weekDays; let i = index">
+              <div class="day-name">{{ day.dayName }}</div>
+            </div>
+          </div>
+          <div class="calendar-body">
+            <div class="time-row" *ngFor="let timeSlot of selectedTimeSlots; let timeIndex = index">
+              <div class="time-slot-label">{{ timeSlot }}</div>
+
+              <div
+                class="day-cell"
+                *ngFor="let day of weekDays; let dayIndex = index"
+                [class.selected]="isTimeSlotSelected(day, timeSlot)"
+                [title]="day.dayName + ' at ' + timeSlot"
+              >
+                <!-- invisible native checkbox covers entire cell -->
+                <input
+                  type="checkbox"
+                  class="day-checkbox"
+                  [checked]="isTimeSlotSelected(day, timeSlot)"
+                  (change)="toggleTimeSlot(day, timeSlot)"
+                  [attr.aria-label]="'Select ' + day.dayName + ' at ' + timeSlot"
+                />
+
+                <!-- your styled ✓ -->
+                <span class="checkmark" *ngIf="isTimeSlotSelected(day, timeSlot)">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <span class="create-error-message" *ngIf="createError">{{ createError }}</span>
+      <button class="cancel-btn" (click)="closeCreateModal()">Cancel</button>
+      <button class="create-btn" (click)="createOffering()">Create Offering</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Delete Offering</h2>
+      <button class="close-btn" (click)="closeDeleteModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <p>Are you sure you want to delete the offering "{{ offeringToDelete?.lesson?.name }}"?</p>
+      <p>This action cannot be undone.</p>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="cancel-btn" (click)="closeDeleteModal()">Cancel</button>
+      <button class="delete-btn" (click)="deleteOffering()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Modal -->
+<div class="modal-overlay" *ngIf="showScheduleModal" (click)="closeScheduleModal()">
+  <div class="modal-content schedule-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="schedule-header">Schedule</h2>
+      <button class="close-btn" (click)="closeScheduleModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="schedule-calendar">
+        <div class="calendar-header">
+          <div class="time-column-header">Time</div>
+          <div class="day-header" *ngFor="let day of weekDays; let i = index">
+            <div class="day-name">{{ getShortDayName(day.dayName) }}</div>
+          </div>
+        </div>
+        <div class="calendar-body">
+          <div class="time-row" *ngFor="let timeSlot of selectedTimeSlots; let timeIndex = index">
+            <div class="time-slot-label">{{ timeSlot }}</div>
+
+            <div
+              class="day-cell"
+              *ngFor="let day of weekDays; let dayIndex = index"
+              [class.available]="isTimeSlotAvailableForOffering(day, timeSlot, selectedOfferingForSchedule!)"
+              [title]="day.dayName + ' at ' + timeSlot"
+            >
+              <span class="available-checkmark" *ngIf="isTimeSlotAvailableForOffering(day, timeSlot, selectedOfferingForSchedule!)">✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

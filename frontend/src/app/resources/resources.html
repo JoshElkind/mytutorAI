@@ -1,0 +1,388 @@
+<!-- Header Section -->
+<div class="header-section">
+  <div class="header-content">
+    <h1 class="page-title">My Resources</h1>
+  </div>
+</div>
+
+<!-- Grid Row: Filter/Resources and Materials side by side -->
+<div class="resource-materials-grid">
+  <!-- Left: Filter and Resources -->
+  <div class="resource-box">
+    <div class="filter-row">
+      <div class="filter-section">
+        <div class="filter-buttons">
+          <button 
+            class="filter-button" 
+            [class.active]="selectedFilter === 'all'"
+            (click)="selectedFilter = 'all'">
+            All
+          </button>
+          <button 
+            class="filter-button" 
+            [class.active]="selectedFilter === 'learning'"
+            (click)="selectedFilter = 'learning'">
+            Learning
+          </button>
+          <button 
+            class="filter-button" 
+            [class.active]="selectedFilter === 'worksheet'"
+            (click)="selectedFilter = 'worksheet'">
+            Worksheets
+          </button>
+          <button 
+            class="filter-button" 
+            [class.active]="selectedFilter === 'quiz'"
+            (click)="selectedFilter = 'quiz'">
+            Quizzes
+          </button>
+        </div>
+        <div class="search-section">
+          <input 
+            type="text" 
+            [(ngModel)]="resourceSearch" 
+            placeholder="Search resources..."
+            class="resource-search-input"
+            (input)="onResourceSearch()">
+        </div>
+      </div>
+      <div class="button-group">
+        <button class="generate-btn" (click)="openGenerateModal()">
+          <img src="/whitesparkles.png" alt="Generate" class="sparkles-icon" style="height: 1.2em; width: auto; margin-right: 6px; display: inline-block; vertical-align: middle;" />
+          Generate
+        </button>
+        <button class="add-resource-btn" (click)="openUploadModal()">
+          <span class="plus-icon">+</span>
+          Add Resource
+        </button>
+      </div>
+    </div>
+    <!-- Resources Content Container -->
+    <div class="content-container">
+      <div class="resources-list">
+        <!-- Resource Cards -->
+        <div class="resource-card" *ngFor="let resource of filteredResources">
+          <div class="resource-header">
+            <span class="resource-type" [ngClass]="resource.resourceType">{{ resource.resourceType | titlecase }}</span>
+          </div>
+          <div class="resource-content">
+            <div class="resource-name">{{ resource.name }}</div>
+            <div class="resource-file-info">
+              {{ resource.fileName }}
+              <span class="file-stats">• {{ getFileSize(resource) }}</span>
+            </div>
+            <div class="resource-uploaded">Uploaded: {{ resource.createdAt | date:'short' }}</div>
+          </div>
+          <div class="resource-actions">
+            <button class="view-button" (click)="previewResource(resource)">View</button>
+            <button class="delete-button" (click)="deleteResource(resource)">Delete</button>
+          </div>
+        </div>
+        
+        <!-- No Resources Message -->
+        <div class="empty-state resources-empty-state" *ngIf="filteredResources.length === 0">
+          <h3>No Resources Found</h3>
+          <p>You haven't uploaded any resources yet. Click "Add Resource" to get started.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Materials -->
+  <div class="materials-section full-height">
+    <div class="materials-header-row">
+      <h2 class="materials-title">Materials</h2>
+      <button class="add-material-btn" (click)="openMaterialModal()">
+        <span class="plus-icon">+</span>
+        Add Material
+      </button>
+    </div>
+    <!-- Materials Content Container -->
+    <div class="content-container">
+      <div class="materials-list">
+        <!-- Material Cards -->
+        <div class="material-card" *ngFor="let material of materials">
+          <div class="material-info">
+            <div class="material-name">{{ material.name }}</div>
+            <div class="material-resources-count">{{ material.resources?.length || 0 }} resources</div>
+            <!-- Removed resource-type pill from here -->
+          </div>
+          <div class="material-actions">
+            <button class="view-button" (click)="openMaterialViewModal(material)">
+              <!-- Heroicons Eye Outline, White Fill -->
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
+                <path stroke="#fff" stroke-width="2" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"/>
+                <circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="2"/>
+              </svg>
+            </button>
+            <button class="delete-button" (click)="deleteMaterial(material)">
+              <!-- Minus sign -->
+              <span style="font-size: 1.5em; font-weight: bold; color: #fff;">&minus;</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- No Materials Message -->
+        <div class="empty-state" *ngIf="materials.length === 0">
+          <h3>No Material Packages</h3>
+          <p>You haven't created any material packages yet. Click "Add Material" to create your first package.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="upload-modal-overlay" *ngIf="showUploadModal">
+  <div class="upload-modal">
+    <div class="modal-header">
+      <h3>Add Resource</h3>
+      <button class="close-button" (click)="closeUploadModal()">×</button>
+    </div>
+    <div class="modal-content">
+      <div class="form-group">
+        <label for="resourceName">Name</label>
+        <input type="text" id="resourceName" [(ngModel)]="newResource.name" placeholder="Enter resource name" class="form-input name-input">
+      </div>
+      
+      <div class="form-group">
+        <label for="resourceType">Select Type</label>
+        <div class="dropdown-container">
+          <div class="dropdown-trigger" (click)="showTypeDropdown = !showTypeDropdown" [class.error]="showErrors && !newResource.type">
+            <span *ngIf="!newResource.type" class="placeholder">Choose a type</span>
+            <span *ngIf="newResource.type" class="selected-subject">{{ newResource.type | titlecase }}</span>
+            <span class="dropdown-arrow">▼</span>
+          </div>
+          <div class="dropdown-menu" *ngIf="showTypeDropdown">
+            <div class="dropdown-option" (click)="selectResourceType('learning'); showTypeDropdown = false;">Learning</div>
+            <div class="dropdown-option" (click)="selectResourceType('worksheet'); showTypeDropdown = false;">Worksheet</div>
+            <div class="dropdown-option" (click)="selectResourceType('quiz'); showTypeDropdown = false;">Quiz</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Upload File</label>
+        <div class="drag-drop-area" 
+             (dragover)="onDragOver($event)" 
+             (dragleave)="onDragLeave($event)" 
+             (drop)="onDrop($event)"
+             (click)="triggerFileInput()"
+             [class.drag-over]="isDragOver">
+          <div class="drag-drop-content">
+            <p class="drag-text">Drag Files Here or Click to Browse</p>
+            <p class="file-types">Supported formats: PDF, DOCX</p>
+          </div>
+          <input type="file" 
+                 id="fileInput" 
+                 accept=".pdf,.docx" 
+                 (change)="onFileSelected($event)" 
+                 class="file-input"
+                 style="display: none;">
+          <div class="selected-file" *ngIf="selectedFile">
+            <span class="file-name">{{ selectedFile.name }}</span>
+            <button type="button" class="remove-file" (click)="removeFile()">×</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="cancel-button" (click)="closeUploadModal()">Cancel</button>
+        <button class="upload-button" (click)="uploadResource()" [disabled]="!canUpload()">Upload</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Material Creation Modal -->
+<div class="material-modal-overlay" *ngIf="showMaterialModal">
+  <div class="material-modal" (click)="$event.stopPropagation()">
+    <button class="close-button top-right" (click)="closeMaterialModal()">×</button>
+    <div class="material-modal-content">
+      <div class="material-modal-header flex-row" style="display: flex; align-items: center; justify-content: space-between;">
+        <input 
+          type="text" 
+          id="materialName" 
+          [(ngModel)]="newMaterial.name" 
+          placeholder="Enter material name..."
+          class="material-name-input"
+          style="flex: 1 1 auto; max-width: 80%;">
+        <button class="close-button top-right" (click)="closeMaterialModal()" style="flex-shrink: 0; margin-left: 16px;">×</button>
+      </div>
+      <div class="modal-header-separator"></div>
+      <div class="attach-resources-container">
+        <div class="attach-resources-row" style="display: flex; align-items: center; justify-content: space-between;">
+          <h4 style="margin: 0;">Attach Resources</h4>
+          <span class="age-level-counter">{{ selectedResourceIds.length }}</span>
+        </div>
+        <div class="attach-panel-header-row">
+          <input 
+            type="text" 
+            [(ngModel)]="resourceSearchTerm" 
+            placeholder="Search resources..."
+            class="resource-search-input attach-search-input">
+        </div>
+        <div class="resources-panel-list">
+          <div class="resource-panel-item" *ngFor="let resource of filteredResourcesForSelection">
+            <label class="resource-checkbox-label">
+              <input type="checkbox" [checked]="selectedResourceIds.includes(resource.id)" (change)="toggleResourceSelection(resource.id)" />
+              <span class="custom-checkbox"></span>
+              <span class="resource-name">{{ resource.name }} ({{ resource.resourceType }})</span>
+            </label>
+          </div>
+          <div class="no-resources-panel" *ngIf="filteredResourcesForSelection.length === 0">
+            No resources found.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="material-modal-footer">
+      <button class="cancel-btn" (click)="closeMaterialModal()">Cancel</button>
+      <button class="create-btn" (click)="createMaterial()" [disabled]="!canCreateMaterial()">Create Material</button>
+    </div>
+  </div>
+</div>
+
+<!-- Material View Modal -->
+<div class="modal-overlay" *ngIf="showMaterialViewModal" (click)="closeMaterialViewModal()">
+  <div class="material-view-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ selectedMaterialForView?.name }}</h2>
+      <button class="close-button top-right" (click)="closeMaterialViewModal()">×</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="material-description" *ngIf="selectedMaterialForView?.description && selectedMaterialForView?.description !== 'Material package'">
+        {{ selectedMaterialForView?.description }}
+      </div>
+      
+      <div class="material-resources">
+        <h3 class="material-resources-title">Resources in this package:</h3>
+        <div class="resource-list">
+          <div class="resource-item" *ngFor="let resource of selectedMaterialForView?.resources">
+            <div class="resource-info">
+              <span class="resource-name material-view-resource-name">{{ resource.name }}</span>
+              <span class="resource-type {{ 'resource-type ' + (resource.resourceType || '').toLowerCase() }}">{{ resource.resourceType | titlecase }}</span>
+            </div>
+            <!-- Removed the View button here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Popup -->
+<app-loading-popup 
+  [isVisible]="showLoadingPopup"
+  [title]="loadingTitle"
+  [message]="loadingMessage">
+</app-loading-popup>
+
+<!-- Generate Modal -->
+<div class="generate-modal-overlay" *ngIf="showGenerateModal">
+  <div class="generate-modal" (click)="$event.stopPropagation()">
+    <button class="close-button top-right" (click)="closeGenerateModal()">×</button>
+    <div class="material-modal-content">
+      <div class="material-modal-header flex-row" style="display: flex; align-items: center; justify-content: space-between;">
+        <input 
+          type="text" 
+          id="generateName" 
+          [(ngModel)]="generateForm.name" 
+          placeholder="Enter name..."
+          class="material-name-input"
+          style="flex: 1 1 auto; max-width: 80%;">
+        <button class="close-button top-right" (click)="closeGenerateModal()" style="flex-shrink: 0; margin-left: 16px;">×</button>
+      </div>
+      <div class="modal-header-separator"></div>
+      <!-- Number of Questions with horizontal layout -->
+      <div class="generate-form-row">
+        <div class="form-group generate-form-group">
+          <label for="questionCount" class="generate-form-label">
+            Number of Questions <span class="max-questions-light">(max 5)</span>
+          </label>
+          <input type="number" id="questionCount" [(ngModel)]="generateForm.questionCount" min="1" max="5" class="form-input no-spinner generate-number-input">
+        </div>
+      </div>
+      <!-- Question Type on its own line -->
+      <div class="generate-form-row question-type-row">
+        <div class="form-group generate-form-group">
+          <label for="questionType" class="generate-form-label">Question Type</label>
+          <div class="dropdown-container generate-dropdown-container">
+            <div class="dropdown-trigger" (click)="showQuestionTypeDropdown = !showQuestionTypeDropdown">
+              <span *ngIf="!generateForm.questionType" class="placeholder">Choose type</span>
+              <span *ngIf="generateForm.questionType === 'multiple_choice'">Multiple Choice</span>
+              <span *ngIf="generateForm.questionType === 'long_answer'">Long Answer</span>
+              <span *ngIf="generateForm.questionType === 'short_answer'">Short Answer</span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="showQuestionTypeDropdown">
+              <div class="dropdown-option" (click)="selectQuestionType('multiple_choice'); showQuestionTypeDropdown = false;">Multiple Choice</div>
+              <div class="dropdown-option" (click)="selectQuestionType('long_answer'); showQuestionTypeDropdown = false;">Long Answer</div>
+              <div class="dropdown-option" (click)="selectQuestionType('short_answer'); showQuestionTypeDropdown = false;">Short Answer</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="attach-resources-container">
+        <div class="attach-resources-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 0;">
+          <h4 style="margin: 0;">Generate From Learning Resource</h4>
+        </div>
+        <div class="attach-panel-header-row">
+          <input 
+            type="text" 
+            [(ngModel)]="resourceSearchTerm" 
+            placeholder="Search learning resources..."
+            class="resource-search-input attach-search-input">
+        </div>
+        <div class="resources-panel-list">
+          <div class="resource-panel-item" *ngFor="let resource of filteredLearningResources()"
+               (click)="selectResourceForGeneration(resource)"
+               [class.selected]="generateForm.selectedResourceId === resource.id"
+               style="cursor: pointer;">
+            <label class="resource-checkbox-label" style="width: 100%; cursor: pointer;">
+              <input type="radio" name="generateResourceRadio" [checked]="generateForm.selectedResourceId === resource.id" (change)="selectResourceForGeneration(resource)" />
+              <span class="custom-checkbox"></span>
+              <span class="resource-name">{{ resource.name }}</span>
+            </label>
+          </div>
+          <div class="no-resources-panel" *ngIf="filteredLearningResources().length === 0">
+            No learning resources found.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="material-modal-footer">
+      <button class="cancel-btn" (click)="closeGenerateModal()">Cancel</button>
+      <button class="generate-purple-button" (click)="generateResource()" [disabled]="!canGenerate()">
+        <img src="/whitesparkles.png" alt="Generate" class="sparkles-icon" style="height: 1.2em; width: auto; margin-right: 6px; display: inline-block; vertical-align: middle;" />
+        Generate
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal-overlay" *ngIf="showDeleteModal">
+  <div class="delete-modal">
+    <div class="delete-modal-header" style="justify-content: flex-end;">
+      <h3 style="margin: 0 auto 0 0;">Delete</h3>
+    </div>
+    <div class="delete-modal-content">
+      <p style="text-align: center; font-size: 1.1em; margin: 32px 0;">
+        Are you sure you want to delete this {{ resourceToDelete ? 'Resource' : 'Material' }}?
+      </p>
+      <div class="delete-modal-actions" style="justify-content: flex-end;">
+        <button class="cancel-button" (click)="closeDeleteModal()">Cancel</button>
+        <button class="delete-confirm-button"
+                (click)="resourceToDelete ? confirmDeleteResource() : confirmDeleteMaterial()"
+                [disabled]="isDeletingResource">
+          <span *ngIf="!isDeletingResource">Delete</span>
+          <span *ngIf="isDeletingResource">Deleting...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

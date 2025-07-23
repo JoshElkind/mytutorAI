@@ -1,0 +1,267 @@
+<div class="header-with-separator">
+  <div class="header-title">
+    <h1>Explore Offerings</h1>
+    <p class="header-subtitle">Discover amazing tutors and lessons</p>
+  </div>
+  <div class="header-actions coupled-actions">
+    <button class="filters-toggle-btn" (click)="showFilters = !showFilters">
+      <span class="filter-icon">🔍</span>
+      Filters
+    </button>
+    <div class="sort-dropdown-container" [class.open]="showSortDropdown">
+      <div class="sort-dropdown-trigger" (click)="showSortDropdown = !showSortDropdown">
+        <span>{{ getSortDisplayText() }}</span>
+        <span class="dropdown-arrow">▼</span>
+      </div>
+      <div class="sort-dropdown-menu" *ngIf="showSortDropdown">
+        <div class="sort-dropdown-option" (click)="setSort('relevance')">Relevance</div>
+        <div class="sort-dropdown-option" (click)="setSort('price-low')">Price: Low to High</div>
+        <div class="sort-dropdown-option" (click)="setSort('price-high')">Price: High to Low</div>
+        <div class="sort-dropdown-option" (click)="setSort('rating')">Highest Rated</div>
+        <div class="sort-dropdown-option" (click)="setSort('enrolled')">Most Popular</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Search Bar -->
+<div class="search-container">
+  <div class="search-box">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      placeholder="Search for lessons, subjects, or tutors..."
+      class="search-input"
+      (keyup.enter)="onSearch()"
+    />
+    <button class="search-btn" (click)="onSearch()">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21 21L16.514 16.506L21 21ZM19 10.5C19 15.194 15.194 19 10.5 19C5.806 19 2 15.194 2 10.5C2 5.806 5.806 2 10.5 2C15.194 2 19 5.806 19 10.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Filters Panel -->
+<div class="filters-panel" *ngIf="showFilters">
+  <div class="filters-header">
+    <button class="clear-filters-btn" (click)="clearFilters()">Clear All</button>
+  </div>
+  
+  <div class="filters-grid">
+    <!-- Subject Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Subject</label>
+      <div class="dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleDropdown('subject')">
+          <span>{{ filters.subject || 'All Subjects' }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="dropdown-menu" *ngIf="activeDropdown === 'subject'">
+          <div class="dropdown-option" (click)="selectFilter('subject', '')">All Subjects</div>
+          <div class="dropdown-option" *ngFor="let subject of subjects" (click)="selectFilter('subject', subject)">
+            {{ subject }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Age Group Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Age Group</label>
+      <div class="dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleDropdown('ageGroup')">
+          <span>{{ filters.ageGroup || 'All Ages' }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="dropdown-menu" *ngIf="activeDropdown === 'ageGroup'">
+          <div class="dropdown-option" (click)="selectFilter('ageGroup', '')">All Ages</div>
+          <div class="dropdown-option" *ngFor="let ageGroup of ageGroups" (click)="selectFilter('ageGroup', ageGroup)">
+            {{ ageGroup }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Price Range Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Price Range</label>
+      <div class="dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleDropdown('priceRange')">
+          <span>{{ filters.priceRange || 'Any Price' }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="dropdown-menu" *ngIf="activeDropdown === 'priceRange'">
+          <div class="dropdown-option" (click)="selectFilter('priceRange', '')">Any Price</div>
+          <div class="dropdown-option" *ngFor="let range of priceRanges" (click)="selectFilter('priceRange', range)">
+            {{ range }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Duration Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Duration</label>
+      <div class="dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleDropdown('duration')">
+          <span>{{ filters.duration || 'Any Duration' }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="dropdown-menu" *ngIf="activeDropdown === 'duration'">
+          <div class="dropdown-option" (click)="selectFilter('duration', '')">Any Duration</div>
+          <div class="dropdown-option" *ngFor="let duration of durations" (click)="selectFilter('duration', duration)">
+            {{ duration }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Availability Filter -->
+    <div class="filter-group">
+      <label class="filter-label">Availability</label>
+      <div class="dropdown-container">
+        <div class="dropdown-trigger" (click)="toggleDropdown('availability')">
+          <span>{{ filters.availability || 'Any Time' }}</span>
+          <span class="dropdown-arrow">▼</span>
+        </div>
+        <div class="dropdown-menu" *ngIf="activeDropdown === 'availability'">
+          <div class="dropdown-option" (click)="selectFilter('availability', '')">Any Time</div>
+          <div class="dropdown-option" *ngFor="let availability of availabilityOptions" (click)="selectFilter('availability', availability)">
+            {{ availability }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State Overlay -->
+<!-- <div class="loading-overlay" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+  <p>Searching for offerings...</p>
+</div> -->
+
+<!-- Offerings Grid -->
+<div class="offerings-container" (click)="closeAllGradeDropdowns(); closeAllDropdowns()">
+  <!-- Loading indicator for initial load -->
+  <div class="initial-loading" *ngIf="isLoading && !(offerings$ | async)?.length">
+    <div class="loading-spinner"></div>
+    <p>Loading offerings...</p>
+  </div>
+  
+  <div class="offerings-grid" *ngIf="(offerings$ | async) && (offerings$ | async)!.length > 0">
+    <div class="offering-card clickable" *ngFor="let offering of offerings$ | async" (click)="onLessonNameClick(offering)">
+      <!-- Card Header -->
+      <div class="offering-header">
+        <h3 class="lesson-name clickable" (click)="onLessonNameClick(offering)">
+          {{ offering.lesson.name }}
+        </h3>
+        <button 
+          class="tutor-profile-button" 
+          (click)="$event.stopPropagation(); openTutorProfile(offering.tutor)">
+          <span class="tutor-emoji">👨‍🏫</span>
+          <span class="tutor-name">{{ offering.tutor.name }}</span>
+        </button>
+      </div>
+
+      <!-- Tutor Rating -->
+      <!-- Removed rating stars, number, and session count as per new design -->
+
+      <!-- Lesson Info -->
+      <div class="lesson-info">
+        <div class="lesson-subject">
+          <div class="subject-left">
+            <span class="subject-emoji">{{ getSubjectEmoji(offering.lesson.subject) }}</span>
+            <span class="subject-name">{{ offering.lesson.subject }}</span>
+          </div>
+          <div class="center-dot">
+            <span class="separator">•</span>
+          </div>
+          <div class="age-group-container">
+            <div 
+              class="age-group-badge" 
+              [class.clickable]="offering.lesson.ageGroup === 'Grade School'"
+              (click)="offering.lesson.ageGroup === 'Grade School' ? toggleGradesDropdown(offering.id, $event) : null">
+              {{ offering.lesson.ageGroup }}
+              <span class="dropdown-arrow" *ngIf="offering.lesson.ageGroup === 'Grade School'">▼</span>
+            </div>
+            <!-- Grades Dropdown -->
+            <div class="grades-dropdown" *ngIf="showGradesDropdown[offering.id] && offering.lesson.ageGroup === 'Grade School' && offering.lesson.grades?.length">
+              <div class="grade-item" *ngFor="let grade of offering.lesson.grades">
+                {{ grade }}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="lesson-description-preview" *ngIf="offering.lesson.description">
+          {{ offering.lesson.description }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-center-content" *ngIf="(offerings$ | async) && (offerings$ | async)!.length === 0 && !isLoading">
+    <div class="empty-title-black">No Offerings Found</div>
+    <p class="empty-desc-grey">Try adjusting your search terms or filters to find more offerings.</p>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-container" *ngIf="totalPages > 1">
+    <div class="pagination-controls">
+      <!-- Previous Button -->
+      <button 
+        class="pagination-btn prev-btn" 
+        (click)="goToPreviousPage()"
+        [disabled]="currentPage === 1">
+        ← Previous
+      </button>
+
+      <!-- Page Numbers -->
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()"
+          class="page-btn"
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+      </div>
+
+      <!-- Next Button -->
+      <button 
+        class="pagination-btn next-btn" 
+        (click)="goToNextPage()"
+        [disabled]="currentPage === totalPages">
+        Next →
+      </button>
+    </div>
+
+    <!-- Page Info -->
+    <div class="page-info">
+      Page {{ currentPage }} of {{ totalPages }}
+    </div>
+  </div>
+</div> 
+
+<!-- Tutor Profile Preview Popup -->
+<app-tutor-profile-preview
+  [isVisible]="showTutorProfilePopup"
+  [tutor]="selectedTutor"
+  (closeModal)="closeTutorProfile()"
+  (messageTutor)="onMessageTutor($event)">
+</app-tutor-profile-preview>
+
+<!-- Messages Modal -->
+<div class="messages-modal" *ngIf="showMessages">
+  <div class="messages-modal-content">
+    <div class="messages-modal-header">
+      <h2>Messages</h2>
+      <button class="close-button" (click)="closeMessages()">×</button>
+    </div>
+    <div class="messages-modal-body">
+      <!-- The app-messages component and its bindings are removed -->
+    </div>
+  </div>
+</div> 

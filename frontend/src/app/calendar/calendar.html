@@ -1,0 +1,187 @@
+<div class="calendar-header-section">
+  <div class="calendar-header-content">
+    <h1 class="calendar-page-title with-purple-underline align-right">My Calendar</h1>
+  </div>
+</div>
+
+<!-- Main calendar container -->
+<div class="calendar-container">
+  <div class="event-list-section full-height">
+    <h2 class="list-title">Upcoming Sessions</h2>
+    <div class="event-list">
+      <ng-container *ngIf="(sessions$ | async) as sessions">
+        <div *ngIf="filteredUpcomingSessions(sessions).length === 0" class="no-events light-grey">No upcoming sessions.</div>
+        <div class="event-list-item" *ngFor="let session of filteredUpcomingSessions(sessions)" (click)="selectSession(session)">
+            <div class="event-time-row">
+              <span class="event-time">{{ session.startTime | date:'short' }}</span>
+              <span class="event-time-remaining" [ngClass]="{'soon': getTimeToEvent(session) < 3600, 'ongoing': isSessionOngoing(session)}">
+                <ng-container *ngIf="isSessionOngoing(session); else notOngoing">
+                  <span class="red-rect"><span class="red-dot"></span>now</span>
+                </ng-container>
+                <ng-template #notOngoing>
+                  <span class="red-rect">{{ getTimeToEventLabel(session) }}</span>
+                </ng-template>
+              </span>
+            </div>
+            <div class="event-title">{{ session.lessonName }}</div>
+            <div class="property-separator"></div>
+            <div class="event-meta">
+              <ng-container *ngIf="currentUser">
+                <button 
+                  class="mini-profile-button" 
+                  *ngIf="currentUser.userType === 'student'"
+                  (click)="$event.stopPropagation(); openTutorProfile({
+                    id: session.tutorId,
+                    name: session.tutorName,
+                    email: session.tutorEmail,
+                    userType: 'tutor'
+                  })">
+                  <span class="tutor-emoji">👨‍🏫</span>
+                  <span class="profile-name">{{ session.tutorName }}</span>
+                </button>
+                <button 
+                  class="mini-profile-button" 
+                  *ngIf="currentUser.userType === 'tutor'"
+                  (click)="$event.stopPropagation(); openStudentProfile({
+                    id: session.studentId,
+                    name: session.studentName,
+                    email: session.studentEmail,
+                    userType: 'student'
+                  })">
+                  <span class="student-emoji">👨‍🎓</span>
+                  <span class="profile-name">{{ session.studentName }}</span>
+                </button>
+              </ng-container>
+              <div class="property-separator"></div>
+              <span class="event-duration">Duration: {{ session.duration }} min</span>
+            </div>
+          </div>
+        </ng-container>
+    </div>
+  </div>
+  <div class="calendar-view-section">
+    <div class="calendar-header">
+      <button class="arrow-btn" (click)="prevMonth()">&#8592;</button>
+      <span class="month-label">{{ getMonthName() }} {{ currentYear }}</span>
+      <button class="arrow-btn" (click)="nextMonth()">&#8594;</button>
+    </div>
+    <div class="calendar-grid">
+      <div class="calendar-grid-header">
+        <div *ngFor="let day of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']" class="calendar-grid-day-header">{{ day }}</div>
+      </div>
+      <div class="calendar-grid-body">
+        <ng-container *ngFor="let day of calendarDays; let i = index">
+          <div class="calendar-grid-day" [class.empty]="!day.date" (click)="selectDay(day)">
+            <div *ngIf="day.date" class="day-number">{{ day.date.getDate() }}</div>
+            <div class="event-markers">
+              <ng-container *ngFor="let tag of getSessionTagsForDay(day); let j = index">
+                <span class="session-tag" [style.background]="tag.color">{{ tag.session.lessonName }}</span>
+              </ng-container>
+              <span *ngIf="getExtraSessionCountForDay(day) > 0" class="session-tag extra-tag">+{{ getExtraSessionCountForDay(day) }}</span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup for sessions on selected day -->
+  <div class="day-popup" *ngIf="selectedDay">
+    <div class="popup-content">
+      <button class="close-btn" (click)="closeDayPopup()">&times;</button>
+      <h3>Sessions on {{ selectedDay | date:'fullDate' }}</h3>
+      <div *ngIf="sessionsForSelectedDay.length === 0" class="no-events">No sessions for this day.</div>
+      <div *ngFor="let session of sessionsForSelectedDay" class="popup-session-item">
+        <div class="popup-session-title">{{ session.lessonName }}</div>
+        <div class="property-separator"></div>
+        <div class="popup-session-meta">{{ session.startTime | date:'shortTime' }} - {{ session.endTime | date:'shortTime' }}</div>
+        <div class="property-separator"></div>
+        <ng-container *ngIf="currentUser">
+          <!-- Clickable tutor/student name that opens profile preview -->
+          <button 
+            class="mini-profile-button popup-session-meta" 
+            *ngIf="currentUser.userType === 'student'"
+            (click)="$event.stopPropagation(); openTutorProfile({
+              id: session.tutorId,
+              name: session.tutorName,
+              email: session.tutorEmail,
+              userType: 'tutor'
+            })">
+            <span class="tutor-emoji">👨‍🏫</span>
+            <span class="profile-name">{{ session.tutorName }}</span>
+          </button>
+
+          <button 
+            class="mini-profile-button popup-session-meta" 
+            *ngIf="currentUser.userType === 'tutor'"
+            (click)="$event.stopPropagation(); openStudentProfile({
+              id: session.studentId,
+              name: session.studentName,
+              email: session.studentEmail,
+              userType: 'student'
+            })">
+            <span class="student-emoji">👨‍🎓</span>
+            <span class="profile-name">{{ session.studentName }}</span>
+          </button>
+          </ng-container>
+        <div class="property-separator"></div>
+        <div class="popup-session-meta">Duration: {{ session.duration }} min</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup for session details -->
+  <div class="session-details-popup" *ngIf="selectedSession">
+    <div class="popup-content">
+      <button class="close-btn" (click)="closeSessionDetails()">&times;</button>
+      <h3>Session Details</h3>
+      <div class="popup-row"><strong>Lesson:</strong> {{ selectedSession.lessonName }}</div>
+      <div class="property-separator"></div>
+      <div class="popup-row"><strong>Start:</strong> {{ selectedSession.startTime | date:'full' }}</div>
+      <div class="property-separator"></div>
+      <div class="popup-row"><strong>End:</strong> {{ selectedSession.endTime | date:'full' }}</div>
+      <div class="property-separator"></div>
+      <ng-container *ngIf="currentUser">
+        <!-- Clickable tutor/student row with mini profile button -->
+        <div class="popup-row" *ngIf="currentUser.userType === 'student'">
+          <strong>Tutor:</strong>
+          <button 
+            class="mini-profile-button" 
+            (click)="$event.stopPropagation(); openTutorProfile({
+              id: selectedSession.tutorId,
+              name: selectedSession.tutorName,
+              email: selectedSession.tutorEmail,
+              userType: 'tutor'
+            })">
+            <span class="tutor-emoji">👨‍🏫</span>
+            <span class="profile-name">{{ selectedSession.tutorName }}</span>
+          </button>
+        </div>
+        <div class="popup-row" *ngIf="currentUser.userType === 'tutor'">
+          <strong>Student:</strong>
+          <button 
+            class="mini-profile-button" 
+            (click)="$event.stopPropagation(); openStudentProfile({
+              id: selectedSession.studentId,
+              name: selectedSession.studentName,
+              email: selectedSession.studentEmail,
+              userType: 'student'
+            })">
+            <span class="student-emoji">👨‍🎓</span>
+            <span class="profile-name">{{ selectedSession.studentName }}</span>
+          </button>
+        </div>
+      </ng-container>
+      <div class="property-separator"></div>
+      <div class="popup-row"><strong>Duration:</strong> {{ selectedSession.duration }} min</div>
+    </div>
+  </div>
+</div> 
+
+<!-- Add Tutor Profile Preview Component -->
+<app-tutor-profile-preview
+  [isVisible]="showProfilePreview"
+  [tutor]="selectedProfile"
+  (closeModal)="closeProfilePreview()"
+  (messageTutor)="onMessageUser($event)">
+</app-tutor-profile-preview> 

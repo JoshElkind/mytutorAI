@@ -1,0 +1,501 @@
+.video-call-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #1f1f1f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.remote-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.local-video {
+  position: absolute;
+  bottom: 80px;  /* position above the controls */
+  right: 16px;
+  width: 200px;
+  height: 150px;
+  background: #000;
+  object-fit: cover;
+  border: 2px solid #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+  width: 100%;
+  justify-content: center;
+}
+
+.control-btn {
+  background: #ffffff;
+  color: #64748b;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 30px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s;
+  min-width: 140px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &.active {
+    background: #ffffff;
+    color: #64748b;
+  }
+
+  &:not(.active) {
+    .control-icon {
+      opacity: 0.8;
+    }
+  }
+}
+
+.control-icon {
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s;
+  color: #64748b;
+}
+
+/* Layout containers */
+
+.call-container {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  background: #f3f4f6;
+}
+
+.meeting-box, .materials-box {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.meeting-box {
+  flex: 1 1 0;
+  overflow: hidden;
+}
+
+.materials-box {
+  width: 340px;
+  padding: 1rem;
+  overflow-y: auto;
+  * {  // Add a universal selector to ensure all text within materials-box follows base size
+    font-size: 0.45rem;
+  }
+}
+
+@font-face {
+  font-family: 'Noto Color Emoji';
+  src: url('https://fonts.gstatic.com/s/notocolor/v16.0/emoji.ttf') format('truetype');
+}
+
+.materials-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  position: relative;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.materials-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: #7c3aed; /* purple */
+}
+
+.meeting-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.lesson-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.lesson-name {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.session-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: normal;
+  margin-top: 0.4rem;  /* adjusted for larger size difference */
+  text-transform: lowercase;  /* makes it even more subtle */
+}
+
+.participant-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #334155;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  transition: background 0.2s;
+  background: #f3e8ff;
+}
+
+.profile-btn:hover {
+  background: #ede9fe;
+}
+
+.profile-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  background: #e2e8f0;  /* fallback color while loading */
+}
+
+.profile-icon {
+  width: 26px;
+  height: 26px;
+  padding: 4px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  fill: #64748b;
+}
+
+.video-wrapper {
+  flex: 1;
+  position: relative;
+  background: #1f1f1f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding-bottom: 1rem;  /* add small padding to prevent controls from touching edge */
+}
+
+.video-area {
+  flex: 1 1 0;
+  position: relative;
+  background: #1f1f1f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 340px;
+  background: #f9fafb;
+  border-left: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.material-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.material-folder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 0.45rem !important;  // Made even smaller
+}
+
+.material-folder:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.folder-icon {
+  font-family: 'Noto Color Emoji', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+  transition: transform 0.2s ease;
+}
+
+.material-folder:hover .folder-icon {
+  transform: scale(1.1);
+}
+
+.folder-name {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 0.45rem !important;  // Made even smaller
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.material-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #4b5563;
+  padding: 0.5rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #f1f5f9;
+  color: #1f2937;
+}
+
+.resource-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.resource-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  font-size: 0.45rem !important;  // Made even smaller
+}
+
+.resource-item:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.resource-type-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0.08rem;
+  font-size: 0.35rem !important;  // Made even smaller
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  color: white;
+  line-height: 1;
+}
+
+.resource-type-quiz {
+  background-color: #8b5cf6; /* Purple for Quiz */
+}
+
+.resource-type-learning {
+  background-color: #3b82f6; /* Blue for Learning */
+}
+
+.resource-type-worksheet {
+  background-color: #10b981; /* Green for Worksheet */
+}
+
+.resource-icon {
+  font-family: 'Noto Color Emoji', sans-serif;
+  font-size: 2.2rem;
+  margin: 0.6rem 0 0.2rem;
+  transition: transform 0.2s ease;
+  width: auto;
+  height: auto;
+  background: none;
+  border-radius: 0;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resource-item:hover .resource-icon {
+  transform: scale(1.1);
+}
+
+.resource-icon.docx {
+  color: #2563eb;
+}
+
+.resource-icon.pdf {
+  color: #dc2626;
+}
+
+.resource-name {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 0.45rem !important;  // Made even smaller
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1;
+  margin-top: 0.1rem;
+}
+
+.empty-message {
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed #e2e8f0;
+}
+
+.waiting-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 1.25rem;
+  font-style: italic;
+  text-align: center;
+  pointer-events: none;
+}
+
+.other-name {
+  font-weight: 700;
+}
+
+.remote-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f1f1f;
+  border-radius: 50%;
+  padding: 2rem;
+}
+
+.remote-placeholder-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #000;
+}
+
+.remote-placeholder-icon {
+  width: 200px;
+  height: 200px;
+  padding: 2rem;
+  fill: #64748b;
+} 
+
+// Override any potential Angular Material or other framework styles
+::ng-deep .materials-box {
+  .mat-typography {
+    font-size: 0.45rem !important;
+  }
+  
+  .mat-body, .mat-body-1, .mat-typography {
+    font-size: 0.45rem !important;
+  }
+} 

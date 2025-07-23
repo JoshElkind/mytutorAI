@@ -1,0 +1,119 @@
+<div class="call-container">
+  <!-- Meeting Box -->
+  <div class="meeting-box">
+    <div class="meeting-header">
+      <div class="lesson-title">
+        <span class="lesson-name">{{ session?.lessonName }}</span>
+        <span class="session-label">Session</span>
+      </div>
+      <div class="participant-info">
+        {{ participantRole }}:
+        <button class="profile-btn" (click)="openProfile()">
+          <ng-container *ngIf="otherUserProfileUrl; else defaultIcon">
+            <img [src]="otherUserProfileUrl" class="profile-img" [alt]="otherUserName" />
+          </ng-container>
+          <ng-template #defaultIcon>
+            <svg class="profile-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+          </ng-template>
+          <span>{{ otherUserName }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="video-wrapper">
+      <!-- Waiting overlay -->
+      <div class="waiting-overlay" *ngIf="!remoteJoined">
+        Waiting for <span class="other-name">{{ otherUserName }}</span> to join the session...
+      </div>
+
+      <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
+      <!-- Remote camera off placeholder -->
+      <div *ngIf="remoteJoined && remoteCamOff" class="remote-placeholder">
+        <ng-container *ngIf="otherUserProfileUrl; else defaultPlaceholder">
+          <img [src]="otherUserProfileUrl" [alt]="otherUserName" class="remote-placeholder-img" />
+        </ng-container>
+        <ng-template #defaultPlaceholder>
+          <svg class="remote-placeholder-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+          </svg>
+        </ng-template>
+      </div>
+      <video id="localVideo" class="local-video" autoplay playsinline muted></video>
+
+      <div class="controls">
+        <button class="control-btn" [class.active]="!isMicMuted" (click)="toggleMic()">
+          <svg class="control-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Microphone base -->
+            <path [attr.d]="isMicMuted ? 
+              'M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z' :
+              'M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V21h2v-3.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z'"
+              fill="currentColor"/>
+          </svg>
+          {{ isMicMuted ? 'Unmute Mic' : 'Mute Mic' }}
+        </button>
+        <button class="control-btn" [class.active]="!isCamOff" (click)="toggleCam()">
+          <svg class="control-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Camera icon -->
+            <path [attr.d]="isCamOff ? 
+              'M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2z' :
+              'M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z'"
+              fill="currentColor"/>
+          </svg>
+          {{ isCamOff ? 'Turn Camera On' : 'Turn Camera Off' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materials Box -->
+  <div class="materials-box">
+    <!-- Material List -->
+    <ng-container *ngIf="!selectedMaterial">
+      <div class="materials-title">
+        Materials
+        <span class="material-count" *ngIf="materials.length > 0">({{ materials.length }})</span>
+      </div>
+      <div class="material-list">
+        <div class="material-folder" *ngFor="let mat of materials" (click)="selectMaterial(mat)">
+          <span class="folder-icon">📂</span>
+          <span class="folder-name" [title]="mat.name">{{ mat.name }}</span>
+        </div>
+        <div class="empty-message" *ngIf="materials.length === 0">
+          <span>No materials available</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Resource List inside a material -->
+    <ng-container *ngIf="selectedMaterial">
+      <div class="material-header">
+        <button class="back-btn" (click)="backToMaterials()">←</button>
+        <h3 class="materials-title">{{ selectedMaterial.name }}</h3>
+      </div>
+      <div class="resource-list">
+        <div class="resource-item" *ngFor="let res of selectedMaterial.resources" (click)="downloadResource(res)">
+          <div class="resource-type-label" [ngClass]="'resource-type-' + res.resourceType.toLowerCase()">
+            {{ res.resourceType }}
+          </div>
+          <div class="resource-icon" [ngClass]="getFileType(res)">
+            {{ getFileIcon(res) }}
+          </div>
+          <div class="resource-name" [title]="res.name">{{ res.name }}</div>
+        </div>
+        <div class="empty-message" *ngIf="!selectedMaterial.resources || selectedMaterial.resources.length === 0">
+          <span>No resources in this folder</span>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Profile Preview Modal -->
+  <app-tutor-profile-preview
+    [isVisible]="showProfilePreview"
+    [tutor]="selectedProfile"
+    (closeModal)="closeProfilePreview()"
+    (messageTutor)="onMessageUser($event)">
+  </app-tutor-profile-preview>
+</div> 

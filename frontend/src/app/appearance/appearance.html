@@ -1,0 +1,290 @@
+<!-- Header Section -->
+<div class="header-section">
+  <div class="header-content">
+    <h1 class="page-title">My Appearance</h1>
+  </div>
+</div>
+
+<!-- Main Content with Sidebar -->
+<div class="appearance-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <!-- Profile Tab -->
+    <div class="sidebar-item" [class.active]="selectedTab === 'profile'" (click)="selectTab('profile')">
+      <span class="sidebar-text">Profile</span>
+    </div>
+    <!-- Reviews Tab (Tutor Only) -->
+    <ng-container *ngIf="(currentUser$ | async)?.userType === 'tutor'">
+      <div class="sidebar-item" [class.active]="selectedTab === 'reviews'" (click)="selectTab('reviews')">
+        <span class="sidebar-text">Reviews</span>
+      </div>
+      <div class="sidebar-separator"></div>
+    </ng-container>
+    <!-- Separator for Student (between profile and payment) -->
+    <ng-container *ngIf="(currentUser$ | async)?.userType === 'student'">
+      <div class="sidebar-separator"></div>
+    </ng-container>
+    <!-- Payment Tab -->
+    <div class="sidebar-item" [class.active]="selectedTab === 'payment'" (click)="selectTab('payment')">
+      <span class="sidebar-text">Payment</span>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="content-area">
+    <!-- Profile Content -->
+    <div class="profile-content" *ngIf="selectedTab === 'profile'">
+      <div *ngIf="selectedTab === 'profile'" class="profile-editor">
+        <div class="profile-header">
+          <h2 class="small-header">My Profile</h2>
+          <!-- Edit Button -->
+          <button *ngIf="!isEditMode" 
+                  class="edit-btn" 
+                  (click)="enterEditMode()">
+            Edit Profile
+          </button>
+          <!-- Edit Mode Buttons -->
+          <div *ngIf="isEditMode" class="edit-mode-buttons">
+            <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+            <button class="apply-btn" 
+                    (click)="applyChanges()"
+                    [disabled]="profileLoading">             <span *ngIf="profileLoading" class="spinner"></span>
+              <span *ngIf="!profileLoading">Apply</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="profile-grid">
+          <!-- Left 1 Image Upload Area -->
+          <div class="image-upload-section">
+            <div class="field image-field">
+              <label class="field-label">Profile Image</label>
+              <!-- Preview Mode -->
+              <div *ngIf="!isEditMode" class="image-preview-only">
+                <div class="image-preview" *ngIf="imagePreviewUrl">
+                  <img [src]="imagePreviewUrl" alt="Profile" />
+                </div>
+                <div class="no-image-placeholder" *ngIf="!imagePreviewUrl">
+                  <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7,10 12,15 17,10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </div>
+                  <p class="upload-text">No image uploaded</p>
+                </div>
+              </div>
+              <!-- Edit Mode -->
+              <div *ngIf="isEditMode" class="image-upload-area"
+                   (click)="fileInput.click()"
+                   (dragover)="onDragOver($event)"
+                   (dragleave)="onDragLeave($event)"
+                   (drop)="onDrop($event)"
+                   [class.dragover]="isDragOver">
+                <div class="image-preview" *ngIf="imagePreviewUrl">
+                  <img [src]="imagePreviewUrl" alt="Profile preview" />
+                  <div class="image-overlay">
+                    <span class="upload-text">Click to change</span>
+                  </div>
+                </div>
+                <div class="upload-placeholder" *ngIf="!imagePreviewUrl">
+                  <div class="upload-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7,10 12,15 17,10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                  </div>
+                  <p class="upload-text">Click to upload or drag & drop</p>
+                  <p class="upload-hint">JPG, PNG up to 5MB</p>
+                </div>
+              </div>
+              <input #fileInput type="file"
+                     accept="image/*"
+                     (change)="onProfileImageSelected($event)"
+                     style="display: none;" />
+            </div>
+          </div>
+
+          <!-- Right 2 Info and Bio -->
+          <div class="profile-info-section">
+            <!-- Top Half - Info Fields -->
+            <div class="info-fields-grid">
+              <div class="field age-field">
+                <label class="field-label">Age</label>
+                <!-- Preview Mode -->
+                <div *ngIf="!isEditMode" class="preview-value">
+                  {{ profileForm.age || 'Not specified' }}
+                </div>
+                <!-- Edit Mode -->
+                <input *ngIf="isEditMode" type="number"
+                       [(ngModel)]="profileForm.age"
+                       class="input-field"
+                       placeholder="Enter your age"
+                       min="1"
+                       max="120" />
+              </div>
+
+              <div class="field education-field">
+                <label class="field-label">Education</label>
+                <!-- Preview Mode -->
+                <div *ngIf="!isEditMode" class="preview-value">
+                  {{ profileForm.education || 'Not specified' }}
+                </div>
+                <!-- Edit Mode -->
+                <input *ngIf="isEditMode" type="text"
+                       [(ngModel)]="profileForm.education"
+                       class="input-field"
+                       placeholder="e.g., Bachelor's in Computer Science" />
+              </div>
+
+              <div class="field gender-field">
+                <label class="field-label">Gender</label>
+                <!-- Preview Mode -->
+                <div *ngIf="!isEditMode" class="preview-value">
+                  {{ profileForm.gender || 'Not specified' }}
+                </div>
+                <!-- Edit Mode -->
+                <div *ngIf="isEditMode" class="dropdown-container">
+                  <div class="dropdown-trigger" (click)="showGenderDropdown = !showGenderDropdown">
+                    <span *ngIf="!profileForm.gender" class="placeholder">Select Gender</span>
+                    <span *ngIf="profileForm.gender" class="selected-value">{{profileForm.gender}}</span>
+                    <span class="dropdown-arrow">▼</span>
+                  </div>
+                  <div class="dropdown-menu" *ngIf="showGenderDropdown">
+                    <div class="dropdown-option" (click)="selectGender('Male'); showGenderDropdown = false">Male</div>
+                    <div class="dropdown-option" (click)="selectGender('Female'); showGenderDropdown = false">Female</div>
+                    <div class="dropdown-option" (click)="selectGender('Non-binary'); showGenderDropdown = false">Non-binary</div>
+                    <div class="dropdown-option" (click)="selectGender('Prefer not to say'); showGenderDropdown = false">Prefer not to say</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="field timezone-field">
+                <label class="field-label">Time Zone</label>
+                <!-- Preview Mode -->
+                <div *ngIf="!isEditMode" class="preview-value">
+                  {{ profileForm.timezone || 'Not specified' }}
+                </div>
+                <!-- Edit Mode -->
+                <div *ngIf="isEditMode" class="dropdown-container">
+                  <div class="dropdown-trigger" (click)="showTimezoneDropdown = !showTimezoneDropdown">
+                    <span *ngIf="!profileForm.timezone" class="placeholder">Select Time Zone</span>
+                    <span *ngIf="profileForm.timezone" class="selected-value">{{profileForm.timezone}}</span>
+                    <span class="dropdown-arrow">▼</span>
+                  </div>
+                  <div class="dropdown-menu" *ngIf="showTimezoneDropdown">
+                    <div class="dropdown-option" (click)="selectTimezone('Eastern Time (ET)'); showTimezoneDropdown = false">Eastern Time (ET)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Central Time (CT)'); showTimezoneDropdown = false">Central Time (CT)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Mountain Time (MT)'); showTimezoneDropdown = false">Mountain Time (MT)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Pacific Time (PT)'); showTimezoneDropdown = false">Pacific Time (PT)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Alaska Time (AKT)'); showTimezoneDropdown = false">Alaska Time (AKT)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Hawaii Time (HST)'); showTimezoneDropdown = false">Hawaii Time (HST)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('UTC'); showTimezoneDropdown = false">UTC</div>
+                    <div class="dropdown-option" (click)="selectTimezone('GMT'); showTimezoneDropdown = false">GMT</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Central European Time (CET)'); showTimezoneDropdown = false">Central European Time (CET)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Eastern European Time (EET)'); showTimezoneDropdown = false">Eastern European Time (EET)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Japan Standard Time (JST)'); showTimezoneDropdown = false">Japan Standard Time (JST)</div>
+                    <div class="dropdown-option" (click)="selectTimezone('Australian Eastern Time (AET)'); showTimezoneDropdown = false">Australian Eastern Time (AET)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Half - Bio -->
+            <div class="field bio-field">
+              <label class="field-label">Bio</label>
+              <!-- Preview Mode -->
+              <div *ngIf="!isEditMode" class="preview-value bio-preview">
+                {{ profileForm.bio || 'No bio provided' }}
+              </div>
+              <!-- Edit Mode -->
+              <div *ngIf="isEditMode">
+                <div class="word-counter-top">{{400 - profileForm.bio.length}} words remaining</div>
+                <div class="textarea-container">
+                  <textarea [(ngModel)]="profileForm.bio"
+                            (input)="onBioInput($event)"
+                            (keydown)="onBioKeydown($event)"
+                            class="textarea-field"
+                            placeholder="Tell us about yourself..."
+                            rows="8"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="profile-messages">
+          <div *ngIf="profileError" class="error-message">{{ profileError }}</div>
+          <div *ngIf="profileSuccess" class="success-message">{{ profileSuccess }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Content -->
+    <div class="reviews-content" *ngIf="selectedTab === 'reviews'">
+      <div class="reviews-header">
+        <h2 class="reviews-title small-header">My Reviews</h2>
+        <div class="sort-controls">
+          <div class="sort-dropdown-container" [class.open]="showSortDropdown">
+            <div class="sort-dropdown-trigger" (click)="showSortDropdown = !showSortDropdown">
+              <span>{{ getSortLabel() }}</span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="sort-dropdown-menu" *ngIf="showSortDropdown">
+              <div class="sort-dropdown-option" (click)="setSort('date-desc')">Date (Newest First)</div>
+              <div class="sort-dropdown-option" (click)="setSort('date-asc')">Date (Oldest First)</div>
+              <div class="sort-dropdown-option" (click)="setSort('stars-desc')">Stars (Highest First)</div>
+              <div class="sort-dropdown-option" (click)="setSort('stars-asc')">Stars (Lowest First)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-list" *ngIf="reviews$ | async as reviews" style="max-height: 600px; overflow-y: auto;">
+        <div class="review-card" *ngFor="let review of getSortedReviews(reviews)">
+          <div class="review-header">
+            <div class="student-info">
+              <span class="student-emoji">👨‍🎓</span>
+              <span class="student-name">{{ review.studentName }}</span>
+            </div>
+            <div class="stars-container">
+              <span class="star" *ngFor="let star of getStarsArray(review.stars)">⭐</span>
+              <span class="empty-star" *ngFor="let star of getEmptyStarsArray(review.stars)">☆</span>
+            </div>
+          </div>
+          <div class="review-comment" *ngIf="review.comment">
+            {{ review.comment }}
+          </div>
+          <div class="review-date">
+            ~{{ formatDate(review.createdAt) }}
+          </div>
+        </div>
+
+        <div class="no-reviews" *ngIf="reviews.length === 0" style="text-align:center; color: #888; margin: 2em 0; font-size: 1.1em;">
+          <p>You currently have no reviews made by students.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Content -->
+    <div class="payment-content" *ngIf="selectedTab === 'payment'">
+      <h2 class="small-header">Payment & Billing</h2>
+      <p class="payment-description">
+        Manage your saved payment methods, view invoices, and update billing information securely through Stripe.
+      </p>
+
+      <button class="stripe-portal-btn" (click)="openBillingPortal()">
+        <svg class="card-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 9H22" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Manage Payment Methods
+      </button>
+
+      <p class="powered-by">Powered by <span class="stripe-logo">Stripe</span></p>
+    </div>
+  </div>
+</div> 

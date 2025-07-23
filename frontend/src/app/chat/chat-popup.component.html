@@ -1,0 +1,91 @@
+<ng-container *ngIf="(isOpen$ | async)">
+  <div class="chat-overlay" (click)="close()"></div>
+  <div class="chat-container">
+    <div class="chat-header">
+      <span>Messages</span>
+      <button class="close-btn" (click)="close()">×</button>
+    </div>
+
+    <div class="chat-body">
+      <!-- Contacts list -->
+      <div class="contacts">
+        <div class="search-container">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search for a contact..."
+            [(ngModel)]="searchQuery"
+            (input)="filterContacts()"
+          >
+        </div>
+        <div class="contacts-list">
+          <div
+            class="contact"
+            *ngFor="let conv of (filteredConversations$ | async)"
+            [class.selected]="(selectedConversation$ | async)?.userId === conv.userId"
+            (click)="selectConversation(conv)"
+          >
+            <div class="avatar" [style.backgroundImage]="conv.profileImageUrl ? 'url(' + conv.profileImageUrl + ')' : ''">
+              <ng-container *ngIf="!conv.profileImageUrl">
+                <span class="generic-user-icon"></span>
+              </ng-container>
+            </div>
+            <div class="contact-info">
+              <div class="name">{{ conv.name }}</div>
+            </div>
+            <span class="badge" *ngIf="conv.unreadCount > 0">{{ conv.unreadCount }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages section -->
+      <div class="messages">
+        <ng-container *ngIf="(selectedConversation$ | async) as sc">
+          <div class="messages-header">
+            <div class="contact-details">
+              <div class="avatar" [style.backgroundImage]="sc.profileImageUrl ? 'url(' + sc.profileImageUrl + ')' : ''">
+                <ng-container *ngIf="!sc.profileImageUrl">
+                  <span class="generic-user-icon"></span>
+                </ng-container>
+              </div>
+              <div class="name">{{ sc.name }}</div>
+            </div>
+            <div class="message-count">
+              {{ (messages$ | async)?.length || 0 }} messages made
+            </div>
+          </div>
+          <div class="messages-list" #messagesList>
+            <div class="no-messages" *ngIf="!(displayMessages$ | async)?.length">
+              <span>No previous message history.</span>
+            </div>
+            <div
+              class="msg"
+              *ngFor="let msg of (displayMessages$ | async)"
+              [class.own]="msg.sender.id !== sc.userId"
+              [class.compact]="!msg.showTimestamp"
+            >
+              <div class="timestamp" *ngIf="msg.showTimestamp">{{ msg.createdAt | date:'short' }}</div>
+              <div class="bubble">{{ msg.content }}</div>
+            </div>
+          </div>
+          <div class="composer">
+            <textarea 
+              [(ngModel)]="newMessage" 
+              placeholder="Type a message..." 
+              rows="2"
+              (keydown.enter)="$event.preventDefault(); sendMessage()"
+            ></textarea>
+            <button (click)="sendMessage()" [disabled]="!newMessage.trim().length">Send</button>
+          </div>
+        </ng-container>
+
+        <div class="empty-state" *ngIf="!(selectedConversation$ | async)">
+          <div class="no-contact-message">
+            <p class="primary-text">No contact Selected</p>
+            <p class="secondary-text">Select a contact to start messaging.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container> 

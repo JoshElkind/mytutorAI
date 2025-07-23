@@ -1,0 +1,141 @@
+<div class="lesson-detail-header">
+  <div class="header-title">
+    <h1>{{ offering?.lesson?.name }}</h1>
+  </div>
+  <div class="header-actions">
+    <button class="tutor-profile-button" (click)="openTutor()">
+      <span class="tutor-emoji">👨‍🏫</span>
+      <span class="tutor-name">{{ offering?.tutor?.name }}</span>
+    </button>
+  </div>
+</div>
+
+<div class="lesson-detail-content">
+  <!-- Left Section: Details -->
+  <div class="details-section">
+    <h2 class="lesson-details-header"><span class="lesson-details-purple">Lesson Details</span></h2>
+    <div class="lesson-details-grid">
+      <div class="detail-item">
+        <span class="detail-label">Subject</span>
+        <span class="detail-value">{{ offering?.lesson?.subject }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Duration</span>
+        <span class="detail-value">{{ offering?.duration }} minutes</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Price per Session</span>
+        <span class="detail-value">${{ offering?.price }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Age Group</span>
+        <span class="detail-value">{{ offering?.lesson?.ageGroup }}</span>
+      </div>
+    </div>
+    <div class="description-separator"></div>
+    <div class="detail-item description">
+      <span class="detail-label lesson-details-purple">Description</span>
+      <ng-container *ngIf="offering?.lesson?.description && offering.lesson.description.trim() !== ''; else noDesc">
+        <p class="detail-value">{{ offering?.lesson?.description }}</p>
+      </ng-container>
+      <ng-template #noDesc>
+        <p class="detail-value no-description">No description...</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Right Section: Calendar -->
+  <div class="calendar-section">
+    <div class="calendar-header">
+      <div class="cost-info">
+        <span class="cost-label">Total Cost:</span>
+        <span class="cost-value" [ngClass]="{'zero-cost': getTotalCost() === 0}">${{ getTotalCost() }}</span>
+      </div>
+      <div class="sessions-info">
+        <span class="sessions-count">
+          <ng-container *ngIf="selectedSessions.length > 0; else zeroSessions">
+            <span class="sessions-count-number">{{ selectedSessions.length }}</span> Sessions Selected
+          </ng-container>
+          <ng-template #zeroSessions>0 Sessions Selected</ng-template>
+        </span>
+        <button *ngIf="selectedSessions.length > 0" 
+                class="clear-selections-btn" 
+                (click)="clearAllSelections()">
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <div class="calendar-container" style="position: relative;">
+      <div *ngIf="loadingSessions" class="calendar-loading-overlay">
+        <div class="spinner"></div>
+      </div>
+      <!-- Calendar Component -->
+      <div class="calendar-navigation">
+        <button class="nav-btn" (click)="previousMonth()">
+          <span class="arrow">←</span>
+        </button>
+        <span class="current-month">{{ currentMonthYear }}</span>
+        <button class="nav-btn" (click)="nextMonth()">
+          <span class="arrow">→</span>
+        </button>
+      </div>
+
+      <div class="calendar-grid">
+        <!-- Week days header -->
+        <div class="weekday" *ngFor="let day of weekDays">{{ day }}</div>
+        
+        <!-- Calendar days -->
+        <div *ngFor="let day of calendarDays" 
+             class="calendar-day" 
+             [class.other-month]="!day.isCurrentMonth"
+             [class.has-sessions]="day.availableSessions.length"
+             [class.selected]="isDateSelected(day.date)"
+             (click)="openTimeSelectionModal(day)">
+          <span class="day-number">{{ day.dayNumber }}</span>
+          
+          <!-- Available slots count -->
+          <div *ngIf="day.availableSessions.length" class="available-slots-count">
+            {{ day.availableSessions.length }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Time Selection Modal -->
+<div class="time-selection-modal" *ngIf="showTimeSelectionModal" (click)="closeTimeSelectionModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Available Times</h3>
+      <button class="close-btn" (click)="closeTimeSelectionModal()">×</button>
+    </div>
+    <div class="time-slots-list">
+      <div *ngFor="let session of selectedDaySlots" 
+           class="time-slot-item"
+           [class.selected]="isSessionSelected(session)"
+           (click)="toggleSession(session)">
+        {{ formatTime(session.time) }}
+        <span class="checkmark" *ngIf="isSessionSelected(session)">✓</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Action Bar -->
+<div class="action-bar">
+  <div class="action-buttons">
+    <button class="cancel-btn" (click)="cancel()">Cancel</button>
+    <button class="purchase-btn" (click)="purchase()" [disabled]="!selectedSessions.length">
+      Purchase
+    </button>
+  </div>
+</div>
+
+<app-tutor-profile-preview
+  [isVisible]="showTutorPreview"
+  [tutor]="selectedTutor"
+  (closeModal)="closeTutor()"
+  (messageTutor)="messageTutor()"
+></app-tutor-profile-preview> 

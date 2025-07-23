@@ -1,0 +1,356 @@
+.home-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e5e7eb;
+
+  h1 {
+    color: #2c3e50;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+  }
+
+  .auth-section {
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .user-name {
+        font-weight: 500;
+        color: #374151;
+      }
+
+      .user-type {
+        color: #6b7280;
+        font-size: 14px;
+        text-transform: capitalize;
+      }
+
+      .btn-logout {
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+          background: #b91c1c;
+        }
+      }
+    }
+
+    .btn-login {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// Name Display Styles
+.name-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+
+  .name-label {
+    color: #495057;
+    font-weight: 600;
+    min-width: 60px;
+  }
+
+  .name-value {
+    color: #2c3e50;
+    font-weight: 500;
+    
+    &:empty::before {
+      content: 'None';
+      color: #6b7280;
+      font-style: italic;
+    }
+  }
+}
+
+.status-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #e9ecef;
+}
+
+.status-section h2 {
+  color: #495057;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  color: #007bff;
+  font-style: italic;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: #dc3545;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.success {
+  color: #155724;
+  background: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.success pre {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 0.5rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+// Override global button styles for specific buttons
+.get-started-btn:hover:not(:disabled) {
+  background: #fff !important;
+  color: #22d36a !important;
+}
+
+.learn-more-btn:hover:not(:disabled) {
+  background: #fff !important;
+  color: #6b7280 !important;
+}
+
+button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.info-section {
+  background: #e3f2fd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #bbdefb;
+}
+
+.info-section h3 {
+  color: #1976d2;
+  margin-bottom: 1rem;
+}
+
+.info-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.info-section li {
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #bbdefb;
+}
+
+.info-section li:last-child {
+  border-bottom: none;
+}
+
+.user-dashboard {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .user-details {
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+
+    h3 {
+      color: #495057;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .detail-item {
+      margin-bottom: 0.75rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e9ecef;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      strong {
+        color: #495057;
+        margin-right: 0.5rem;
+      }
+    }
+  }
+
+  .dashboard-actions {
+    h3 {
+      color: #495057;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    button {
+      margin-right: 1rem;
+      margin-bottom: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.btn-primary {
+        background: #007bff;
+        color: white;
+
+        &:hover {
+          background: #0056b3;
+        }
+      }
+
+      &.btn-secondary {
+        background: #6c757d;
+        color: white;
+
+        &:hover {
+          background: #545b62;
+        }
+      }
+    }
+  }
+}
+
+/* Hero Section Styles */
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+  margin-top: 1.5rem;
+  padding: 2.5rem 1.5rem 2rem 1.5rem;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px 0 rgba(80, 80, 120, 0.06);
+  position: relative;
+}
+
+.hero-emoji {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #6d28d9;
+  margin: 0.25rem 0 0.5rem 0;
+  letter-spacing: -1px;
+}
+
+.hero-tagline {
+  font-size: 1.25rem;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  max-width: 500px;
+}
+
+.feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  font-size: 1.08rem;
+  font-weight: 500;
+  color: #4b5563;
+  box-shadow: 0 1px 4px 0 rgba(80, 80, 120, 0.04);
+  transition: background 0.2s;
+}
+
+.feature-list li:hover {
+  background: #ede9fe;
+}
+
+.feature-icon {
+  font-size: 1.3rem;
+  margin-right: 0.6rem;
+  display: inline-block;
+}

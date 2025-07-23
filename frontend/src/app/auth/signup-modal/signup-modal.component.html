@@ -1,0 +1,160 @@
+<div class="modal-overlay">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Sign Up</h2>
+      <button class="close-btn" (click)="onClose()">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Step 1: Signup Form -->
+      <div *ngIf="!showCodeStep">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="email" 
+            placeholder="Enter your email"
+            [disabled]="isLoading">
+        </div>
+
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input 
+            type="text" 
+            id="name" 
+            [(ngModel)]="name" 
+            placeholder="Enter your name"
+            [disabled]="isLoading">
+        </div>
+
+        <div class="form-group">
+          <label>I am a:</label>
+          <div class="user-type-toggle">
+            <button 
+              type="button" 
+              [class.active]="userType === 'student'"
+              (click)="userType = 'student'"
+              [disabled]="isLoading">
+              👨‍🎓 Student
+            </button>
+            <button 
+              type="button" 
+              [class.active]="userType === 'tutor'"
+              (click)="userType = 'tutor'"
+              [disabled]="isLoading">
+              👨‍🏫 Tutor
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-primary" 
+            (click)="onSignup()"
+            [disabled]="isSendingCode || isLoading">
+            <span *ngIf="isSendingCode">
+              <span class="spinner"></span> Sending...
+            </span>
+            <span *ngIf="!isSendingCode">Send Code</span>
+          </button>
+        </div>
+
+        <div class="switch-option">
+          <p>Already have an account? <a href="#" (click)="onSwitchToLogin()">Login here</a></p>
+        </div>
+      </div>
+
+      <!-- Step 2: Code Verification -->
+      <div class="form-section" *ngIf="showCodeStep">
+        <div class="otp-info" style="background: #e0f2fe; color: #2563eb; border: 1px solid #90cdf4; border-radius: 10px; padding: 16px; margin-bottom: 20px; text-align: center;">
+          <div style="font-size: 1.1rem; font-weight: 500;">A 4-digit signup code has been sent to your email. Please check your inbox.<br><em style='font-size: 0.95em;'>(It may take a couple of minutes to arrive.)</em></div>
+        </div>
+
+        <div class="form-group">
+          <label for="code" style="font-weight: 600; color: #374151;">Enter 4-digit code</label>
+          <div class="otp-input-container">
+            <input 
+              type="text" 
+              #code1
+              [(ngModel)]="codeDigits[0]"
+              (input)="onCodeInput(0, $event, code1, code2)"
+              (keydown)="onCodeKeydown($event, 0, code1, code2)"
+              maxlength="1"
+              pattern="[0-9]"
+              [disabled]="isLoading"
+              class="otp-digit-input"
+            >
+            <input 
+              type="text" 
+              #code2
+              [(ngModel)]="codeDigits[1]"
+              (input)="onCodeInput(1, $event, code2, code3)"
+              (keydown)="onCodeKeydown($event, 1, code2, code3)"
+              maxlength="1"
+              pattern="[0-9]"
+              [disabled]="isLoading"
+              class="otp-digit-input"
+            >
+            <input 
+              type="text" 
+              #code3
+              [(ngModel)]="codeDigits[2]"
+              (input)="onCodeInput(2, $event, code3, code4)"
+              (keydown)="onCodeKeydown($event, 2, code3, code4)"
+              maxlength="1"
+              pattern="[0-9]"
+              [disabled]="isLoading"
+              class="otp-digit-input"
+            >
+            <input 
+              type="text" 
+              #code4
+              [(ngModel)]="codeDigits[3]"
+              (input)="onCodeInput(3, $event, code4, null)"
+              (keydown)="onCodeKeydown($event, 3, code4, null)"
+              maxlength="1"
+              pattern="[0-9]"
+              [disabled]="isLoading"
+              class="otp-digit-input"
+            >
+          </div>
+        </div>
+
+        <button 
+          class="btn btn-primary" 
+          (click)="onVerifyCode()"
+          [disabled]="code.length !== 4 || isLoading"
+          style="width: 100%; margin-bottom: 10px;"
+        >
+          <span *ngIf="isLoading">
+            <span class="spinner"></span> Signing up...
+          </span>
+          <span *ngIf="!isLoading">Verify & Sign Up</span>
+        </button>
+
+        <div class="resend-section" style="text-align: center; margin-bottom: 16px;">
+          <button 
+            class="btn-link"
+            (click)="onResendCode()"
+            [disabled]="resendCountdown > 0"
+            style="color: #2563eb; text-decoration: underline; background: none; border: none; cursor: pointer; font-size: 1em;"
+          >
+            <span *ngIf="resendCountdown > 0">Resend in {{ resendCountdown }}s</span>
+            <span *ngIf="resendCountdown <= 0">Resend Code</span>
+          </button>
+        </div>
+
+        <hr style="margin: 18px 0; border: none; border-top: 1px solid #e5e7eb;" />
+        <div style="text-align: center; color: #6b7280; font-size: 1em;">
+          Already have an account? <a href="#" (click)="onSwitchToLogin()" style="color: #2563eb; text-decoration: underline;">Login here</a>
+        </div>
+      </div>
+
+      <div *ngIf="message" class="message" [class.error]="message.includes('error') || message.includes('failed') || message.includes('invalid') || message.includes('already exists')">
+        {{ message }}
+      </div>
+    </div>
+  </div>
+</div> 

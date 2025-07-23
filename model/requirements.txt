@@ -1,0 +1,22 @@
+# Core ML and fine-tuning
+transformers
+peft
+torch
+sentence-transformers
+
+# Data processing
+pandas
+PyPDF2
+python-docx
+
+# LangChain and vector DB
+langchain
+chromadb
+langchain-community
+
+# FastAPI for backend
+fastapi
+uvicorn
+
+# For PDF generation (optional)
+fpdf 

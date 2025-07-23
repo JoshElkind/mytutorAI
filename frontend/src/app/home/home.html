@@ -1,0 +1,108 @@
+<div class="home-main-row" style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 1200px; margin: 0 auto; min-height: 70vh; padding: 3rem 2rem;">
+  <div class="home-left" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; min-width: 320px; margin-left: -90px; margin-top: -30px;">
+    <div style="position: relative; width: 300px; height: 300px; margin-left: 60px; margin-bottom: 1.5rem; display: block;">
+      <svg viewBox="0 0 500 500" width="420" height="420" style="position: absolute; top: -70px; left: -70px; z-index: 0; pointer-events: none;">
+        <path fill="#a855f7" d="M419.5,312Q390,374,312,397.5Q234,421,170,393Q106,365,81,282.5Q56,200,109,137Q162,74,241,62.5Q320,51,374,100.5Q428,150,426,225Q424,300,419.5,312Z M350,150Q370,200,350,250Q330,300,270,320Q210,340,170,300Q130,260,150,200Q170,140,230,120Q290,100,330,130Q370,160,350,150Z" />
+      </svg>
+      <img src="/teacher.png" alt="Teacher" class="teacher-photo" style="width: 280px; height: 280px; object-fit: cover; border-radius: 50%; box-shadow: 0 4px 24px rgba(139, 92, 246, 0.12); background: transparent; border: 4px solid #fff; position: absolute; top: 0; left: 10px; z-index: 1;" />
+    </div>
+    <div style="max-width: 480px; width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
+      <h1 class="welcome-text" style="text-align: left; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 1.2rem;">Welcome to MyTutor</h1>
+      <div class="subtitle" style="margin-top: 0; text-align: left; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; font-size: 1.35rem; font-weight: 500; line-height: 1.7; color: #333; margin-bottom: 2.2rem; margin-left: -10px;">
+        Connect with expert tutors and students for personalized learning experiences.<br>
+        Find the perfect match for your educational journey.
+      </div>
+    </div>
+  </div>
+  <div class="home-right" style="flex: 1; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; min-width: 320px;">
+    <div style="margin-left: 8.5rem; width: auto;">
+      <div style="display: flex; flex-direction: row; gap: 1rem; margin-bottom: 1.2rem; align-items: center; margin-top: -1rem;">
+        <button class="get-started-btn" (click)="onGetStarted()">Get Started</button>
+        <button class="learn-more-btn" (click)="onGetHelp()">Learn More</button>
+      </div>
+      <div class="features-list" style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; width: 100%; margin-top: -0.5rem;">
+        <div class="feature-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(139,92,246,0.08); padding: 1rem 1.5rem; min-width: 220px; display: flex; align-items: center; gap: 0.75rem; font-size: 1.08rem;">
+          <span style="font-size: 1.5rem;">🌟</span> Expert, friendly tutors
+        </div>
+        <div class="feature-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(139,92,246,0.08); padding: 1rem 1.5rem; min-width: 220px; display: flex; align-items: center; gap: 0.75rem; font-size: 1.08rem;">
+          <span style="font-size: 1.5rem;">🎯</span> Personalized sessions
+        </div>
+        <div class="feature-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(139,92,246,0.08); padding: 1rem 1.5rem; min-width: 220px; display: flex; align-items: center; gap: 0.75rem; font-size: 1.08rem;">
+          <span style="font-size: 1.5rem;">⏰</span> Flexible scheduling
+        </div>
+        <div class="feature-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(139,92,246,0.08); padding: 1rem 1.5rem; min-width: 220px; display: flex; align-items: center; gap: 0.75rem; font-size: 1.08rem;">
+          <span style="font-size: 1.5rem;">📚</span> Resources for every learner
+        </div>
+        <div class="feature-card" style="background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(139,92,246,0.08); padding: 1rem 1.5rem; min-width: 220px; display: flex; align-items: center; gap: 0.75rem; font-size: 1.08rem;">
+          <span style="font-size: 1.5rem;">🤝</span> Safe, supportive community
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .get-started-btn {
+    background: #fff;
+    color: #22d36a;
+    border: 1.5px solid #22d36a;
+    border-radius: 8px;
+    padding: 0.7rem 1.6rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(34, 211, 106, 0.10);
+    cursor: pointer;
+    transition: border-width 0.2s;
+    outline: none;
+  }
+  .get-started-btn:hover, .get-started-btn:focus {
+    border-width: 2.5px;
+  }
+  .learn-more-btn {
+    background: #fff;
+    color: #6b7280;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.7rem 1.6rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.08);
+    cursor: pointer;
+    transition: border-width 0.2s;
+    outline: none;
+  }
+  .learn-more-btn:hover, .learn-more-btn:focus {
+    border-width: 2.5px;
+  }
+  .explore-btn {
+    background: #fff;
+    color: #8b5cf6;
+    border: 1.5px solid #8b5cf6;
+    border-radius: 8px;
+    padding: 0.7rem 1.6rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.10);
+    cursor: pointer;
+    transition: border-width 0.2s;
+    outline: none;
+  }
+  .explore-btn:hover, .explore-btn:focus {
+    border-width: 2.5px;
+  }
+</style>
+
+  <!-- Login Modal -->
+  <app-login-modal 
+    *ngIf="showLoginModal"
+    (closeModal)="closeLoginModal()"
+    (switchToSignup)="switchToSignup()"
+  ></app-login-modal>
+
+  <!-- Signup Modal -->
+  <app-signup-modal 
+    *ngIf="showSignupModal"
+    (closeModal)="closeSignupModal()"
+    (switchToLogin)="switchToLogin()"
+  ></app-signup-modal>
+

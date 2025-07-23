@@ -1,0 +1,121 @@
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/cache/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+model/venv/
+model/__pycache__/
+model/.ipynb_checkpoints/
+
+# Ruby
+backend/vendor/
+backend/log/
+backend/tmp/
+backend/.bundle/
+backend/.byebug_history
+backend/.yardoc
+backend/.ruby-version
+backend/.env
+backend/db/*.sqlite3
+backend/db/*.sqlite3-journal
+backend/db/schema.rb
+
+# Model/AI
+model/chroma_db/
+model/llama-finetuned/
+model/*.bin
+model/*.pt
+model/*.safetensors
+model/*.csv
+model/*.docx
+model/*.pdf
+model/*.log
+model/*.h5
+model/*.ckpt
+model/*.pkl
+model/*.npz
+model/*.npy
+model/*.sav
+model/*.rdata
+model/*.rds
+model/*.db
+model/*.tar.gz
+model/*.tar
+model/*.zip
+model/*.7z
+
+# General
+.DS_Store
+*.log
+*.bak
+*.swp
+*.tmp
+*.lock
+
+# Ignore local environment files
+.env
+.env.*
+
+# Ignore storage and uploads
+backend/storage/
+backend/public/uploads/
+
+# Ignore test artifacts
+backend/coverage/
+frontend/coverage/
+
+# Ignore IDE/editor files
+.idea/
+.vscode/
+*.code-workspace
+
+# Ignore OS files
+Thumbs.db
+
+# Exclude large or generated files
+*.sqlite3
+*.sqlite3-journal
+*.zip
+*.tar.gz
+*.tar
+*.7z
+*.egg-info/
+*.egg
+*.h5
+*.ckpt
+*.pkl
+*.npz
+*.npy
+*.sav
+*.rdata
+*.rds
+*.db
+*.mdb
+*.bak
+*.tmp
+*.swp
+*.swo
+*.swn
+*.o
+*.so
+*.a
+*.out
+*.exe
+*.dll
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+*.dex
+*.apk
+*.ap_ 

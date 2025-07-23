@@ -1,0 +1,88 @@
+.help-container {
+  max-width: 700px;
+  margin: 3rem auto 0 auto;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(139, 92, 246, 0.08);
+  padding: 2.5rem 2.5rem 2rem 2.5rem;
+  min-height: 480px;
+}
+
+.help-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.help-title {
+  font-size: 2.1rem;
+  font-weight: 400;
+  color: #18181b;
+  letter-spacing: -0.01em;
+}
+
+.help-author {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.author-name {
+  color: #888;
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.author-img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.10);
+}
+
+.help-guide-text {
+  background: #f4f4f7;
+  border-radius: 12px;
+  padding: 2rem 1.5rem 1.5rem 2rem;
+  color: #18181b;
+  font-size: 1.08rem;
+  line-height: 1.7;
+  box-shadow: 0 1px 4px rgba(139, 92, 246, 0.04);
+}
+
+.guide-section {
+  margin-left: 0.5rem;
+  color: #18181b;
+  font-weight: 400;
+}
+
+.guide-section ol, .guide-section ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: #18181b;
+  font-weight: 400;
+}
+
+.guide-section li {
+  margin-bottom: 0.5rem;
+  color: #18181b;
+  font-weight: 400;
+}
+
+.guide-section b, .guide-section strong {
+  color: #18181b;
+  font-weight: 400;
+}
+
+@media (max-width: 800px) {
+  .help-container {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+  }
+  .help-guide-text {
+    padding: 1.2rem 0.5rem 1.2rem 0.5rem;
+  }
+} 

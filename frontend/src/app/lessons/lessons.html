@@ -1,0 +1,340 @@
+<div class="header-with-separator">
+  <div class="header-title">
+    <h1>My Lessons</h1>
+  </div>
+  <div class="header-actions" style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: nowrap; margin-left: auto;">
+    <input type="text" class="lesson-search" placeholder="Search lessons..." [(ngModel)]="lessonSearch" (input)="onLessonSearch()" />
+    <div class="sort-dropdown-container" [class.open]="showSortDropdown">
+      <div class="sort-dropdown-trigger" (click)="showSortDropdown = !showSortDropdown">
+        <span>{{ getSortLabel(sortBy) }}</span>
+        <span class="dropdown-arrow">▼</span>
+      </div>
+      <div class="sort-dropdown-menu" *ngIf="showSortDropdown">
+        <div class="sort-dropdown-option" (click)="setSort('studentCountAsc')">Current Students ↑</div>
+        <div class="sort-dropdown-option" (click)="setSort('studentCountDesc')">Current Students ↓</div>
+        <div class="sort-dropdown-option" (click)="setSort('nameAsc')">By Name ↑</div>
+        <div class="sort-dropdown-option" (click)="setSort('nameDesc')">By Name ↓</div>
+      </div>
+    </div>
+    <button class="add-lesson-btn top-right" (click)="openAddModal()">
+      <span class="add-icon">+</span>
+      Add Lesson
+    </button>
+  </div>
+</div>
+
+<div class="lessons-cards-container">
+  <div class="lessons-grid" *ngIf="filteredLessons.length > 0">
+    <div class="lesson-card" *ngFor="let lesson of filteredLessons; let i = index">
+      <div class="lesson-header">
+        <h3 class="lesson-name">{{ lesson.name }}</h3>
+        <div class="student-count-display">
+          <span class="student-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+          </span>
+          <span class="count">{{ lesson.currentStudentCount || 0 }}</span>
+          <span>/</span>
+          <span class="cap">{{ lesson.studentCap || '∞' }}</span>
+        </div>
+      </div>
+      
+      <div class="lesson-subject">
+        <span class="subject-label">Subject:</span>
+        <span class="subject-name">{{ lesson.subject }}</span>
+        <span class="subject-emoji">{{ getSubjectEmoji(lesson.subject) }}</span>
+      </div>
+      
+      <div class="lesson-details">
+        <div class="detail-item">
+          <span class="detail-label">Age Group:</span>
+          <span class="detail-value">{{ lesson.ageGroup }}</span>
+        </div>
+      </div>
+      
+      <div class="lesson-actions">
+        <button 
+          class="view-description-btn" 
+          (click)="openDescriptionModal(lesson)"
+        >
+          Description
+        </button>
+        <button class="delete-btn" (click)="openDeleteModal(lesson, i)" title="Delete Lesson">
+          ×
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-center-content" *ngIf="filteredLessons.length === 0">
+    <div class="empty-title-black">No Lessons Found</div>
+    <p class="empty-desc-grey">Start by adding your first lesson to showcase your teaching expertise.</p>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="delete-modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+    <div class="delete-modal-container" (click)="$event.stopPropagation()">
+      <div class="delete-modal-header">
+        <h3 class="delete-modal-title">Delete Lesson</h3>
+      </div>
+      <div class="delete-modal-content">
+        <p class="delete-modal-message">
+          Are you sure you want to delete "<strong>{{ lessonToDelete?.name }}</strong>"?
+        </p>
+      </div>
+      <div class="delete-modal-actions">
+        <button class="delete-modal-cancel-btn" (click)="closeDeleteModal()">
+          Cancel
+        </button>
+        <button class="delete-modal-delete-btn" (click)="deleteLesson()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Lesson Modal -->
+  <div class="popup-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+    <div class="popup-container" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="popup-header">
+        <h2 class="popup-title">Add Lesson</h2>
+        <button class="close-btn" (click)="closeAddModal()" type="button">×</button>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="popup-content" (click)="onPopupContentClick($event)">
+        <!-- Top Left - Lesson Name (Larger) -->
+        <div class="field lesson-name-field standout-field">
+          <label class="field-label large">Lesson Name</label>
+          <input 
+            type="text" 
+            [(ngModel)]="lessonForm.name"
+            class="input-field large"
+            placeholder="Enter lesson name"
+            [class.error]="showErrors && (!lessonForm.name || !lessonForm.name.trim())">
+        </div>
+
+        <!-- Top Middle - Subject Selection -->
+        <div class="field subject-field">
+          <label class="field-label">
+            <span class="subject-icon-svg" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 7.5L12 2 2 7.5l10 5.5 10-5.5z"/><path d="M6 10.5V17a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6.5"/></svg>
+            </span>
+            Subject
+          </label>
+          <div class="dropdown-container">
+            <div class="dropdown-trigger" (click)="showSubjectDropdown = !showSubjectDropdown" [class.error]="showErrors && !lessonForm.subject">
+              <span *ngIf="!lessonForm.subject" class="placeholder">Select Subject</span>
+              <span *ngIf="lessonForm.subject" class="selected-subject">
+                {{getSubjectEmoji(lessonForm.subject)}} {{lessonForm.subject}}
+              </span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="showSubjectDropdown">
+              <input 
+                type="text" 
+                [(ngModel)]="subjectSearch"
+                (input)="filterSubjects()"
+                class="search-input"
+                placeholder="Search subjects..."
+                (click)="$event.stopPropagation()">
+              <div class="dropdown-options">
+                <div 
+                  *ngFor="let subject of filteredSubjects"
+                  class="dropdown-option"
+                  (click)="selectSubject(subject.name); showSubjectDropdown = false;">
+                  {{subject.emoji}} {{subject.name}}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Right - Description -->
+        <div class="field description-field">
+          <label class="field-label">Lesson Description</label>
+          <div class="word-counter-top">{{ 500 - getWordCount(lessonForm.description) }}</div>
+          <div class="textarea-container">
+            <textarea 
+              [(ngModel)]="lessonForm.description"
+              (input)="onDescriptionInput($event)"
+              (keydown)="onDescriptionKeydown($event)"
+              class="textarea-field"
+              placeholder="Enter lesson description..."
+              rows="4"></textarea>
+          </div>
+        </div>
+
+        <!-- Middle Left - Student Capacity -->
+        <div class="field student-capacity-field">
+          <label class="field-label capacity-label">
+            <span class="capacity-icon-svg" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>
+            </span>
+            Student Capacity
+          </label>
+          <div class="dropdown-container">
+            <div class="dropdown-trigger" (click)="showCapacityDropdown = !showCapacityDropdown" [class.error]="showErrors && (!lessonForm.capacity || (lessonForm.capacity === 'Specify Cap' && isCustomCapacityInvalid()))">
+              <span *ngIf="!lessonForm.capacity" class="placeholder">Select Cap</span>
+              <span *ngIf="lessonForm.capacity === 'No Cap'" class="selected-subject">No Cap</span>
+              <span *ngIf="lessonForm.capacity === 'Specify Cap'" class="selected-subject">Specify Cap</span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="showCapacityDropdown">
+              <div class="dropdown-option" *ngFor="let cap of capacities" (click)="selectCapacity(cap)">
+                {{cap}}
+              </div>
+            </div>
+          </div>
+          <div class="student-capacity-actions" *ngIf="lessonForm.capacity === 'Specify Cap'">
+            <input 
+              type="number" 
+              min="1" 
+              max="21" 
+              class="student-capacity-input no-spinner long" 
+              [(ngModel)]="lessonForm.customCapacity" 
+              (click)="$event.stopPropagation()" 
+              (change)="onCustomCapacityChange()" 
+              (keydown)="blockNonNumeric($event)"
+              placeholder="enter capacity" 
+              [class.error]="showErrors && lessonForm.capacity === 'Specify Cap' && isCustomCapacityInvalid()" />
+          </div>
+        </div>
+
+        <!-- Middle Right - Age Level -->
+        <div class="field age-level-field">
+          <label class="field-label">
+            <span class="age-icon-svg" aria-hidden="true">
+              <svg width="22" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </span>
+            Age Level
+          </label>
+          <div class="dropdown-container">
+            <div class="dropdown-trigger" (click)="showAgeGroupDropdown = !showAgeGroupDropdown" [class.error]="showErrors && !lessonForm.ageGroup">
+              <span *ngIf="!lessonForm.ageGroup" class="placeholder">Select Age Level</span>
+              <span *ngIf="lessonForm.ageGroup" class="selected-subject">
+                {{lessonForm.ageGroup}}
+              </span>
+              <span class="dropdown-arrow">▼</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="showAgeGroupDropdown">
+              <div class="dropdown-option" (click)="selectAgeGroup('Grade School')">
+                Grade School
+              </div>
+              <div class="dropdown-option" (click)="selectAgeGroup('High School')">
+                High School
+              </div>
+              <div class="dropdown-option" (click)="selectAgeGroup('College')">
+                College
+              </div>
+              <div class="dropdown-option" (click)="selectAgeGroup('Adult')">
+                Adult
+              </div>
+            </div>
+          </div>
+          <!-- Grade Selection for Grade School as floating dropdown -->
+          <!-- Grade Selection for Grade School as floating dropdown -->
+          <div *ngIf="showGradesDropdown" class="grades-popover">
+            <div class="grade-boxes">
+              <div 
+                *ngFor="let grade of gradeOptions" 
+                class="grade-box"
+                [class.selected]="lessonForm.grades.includes(grade)"
+                (click)="toggleGrade(grade)">
+                {{grade}}
+              </div>
+              <div 
+                class="grade-box select-all-box"
+                [class.selected]="lessonForm.grades.length === gradeOptions.length"
+                (click)="selectAllGrades()">
+                Select All
+              </div>
+            </div>
+          </div>
+          <div class="age-level-actions">
+            <button *ngIf="lessonForm.ageGroup === 'Grade School'" class="select-grades-btn" type="button" (click)="openGradesPopover(); $event.stopPropagation()">Select Grades</button>
+            <span class="age-level-counter" [class.error]="showErrors && lessonForm.ageGroup === 'Grade School' && getGradeCount() === 0">{{getGradeCount()}}</span>
+          </div>
+        </div>
+
+        <!-- Bottom Right - Add Materials -->
+        <div class="field materials-field">
+          <div class="materials-header-row">
+            <label class="field-label">Add Materials</label>
+            <span style="flex:1 1 auto;"></span>
+            <button class="manage-materials-btn small-inline" (click)="navigateToResources()">
+              Manage Materials
+            </button>
+          </div>
+          <div class="materials-header">
+            <div class="dropdown-container" style="flex:1 1 auto; min-width:0;">
+              <div class="dropdown-trigger" (click)="showMaterialsDropdown = !showMaterialsDropdown">
+                <span *ngIf="!lessonForm.materials.length" class="placeholder">Select Materials</span>
+                <span *ngIf="lessonForm.materials.length" class="selected-subject">
+                  {{lessonForm.materials.length}} material(s) selected
+                </span>
+                <span class="dropdown-arrow">▼</span>
+              </div>
+              <div class="dropdown-menu" *ngIf="showMaterialsDropdown">
+                <input 
+                  type="text" 
+                  [(ngModel)]="materialsSearch"
+                  (input)="filterMaterials()"
+                  class="search-input"
+                  placeholder="Search materials..."
+                  (click)="$event.stopPropagation()">
+                <div class="dropdown-options">
+                  <div 
+                    *ngFor="let material of filteredMaterials"
+                    class="dropdown-option"
+                    (click)="toggleMaterial(material)">
+                    <input 
+                      type="checkbox" 
+                      [checked]="lessonForm.materials.includes(material)"
+                      (click)="$event.stopPropagation()">
+                    {{material}}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!lessonForm.materials.length" class="materials-helper-text">
+            Add materials to be provided to students during your meetups. This is optional.
+          </div>
+          <!-- Materials Tags Display -->
+          <div class="materials-tags">
+            <ng-container *ngIf="lessonForm.materials.length > 0">
+              <ng-container *ngFor="let material of getDisplayedMaterials()">
+                <span class="material-tag">{{material}} <span class="remove-tag" (click)="removeMaterial(material)">×</span></span>
+              </ng-container>
+              <span *ngIf="getHiddenMaterialsCount() > 0" class="material-tag overflow-tag">+{{getHiddenMaterialsCount()}}</span>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="popup-footer">
+        <button class="add-btn" (click)="addLesson()" type="button">Add Lesson</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description Modal -->
+  <div class="modal-overlay" *ngIf="showDescriptionModal" (click)="closeDescriptionModal()">
+    <div class="modal-content description-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedLesson?.name || 'Description' }}</h2>
+        <button class="close-btn" (click)="closeDescriptionModal()">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="description-content" [innerHTML]="selectedDescription">
+        </div>
+      </div>
+      
+      
+    </div>
+  </div>
+</div>

@@ -1,0 +1,91 @@
+<!-- Tutor Profile Preview Modal -->
+<div class="modal-overlay" *ngIf="isVisible" (click)="close()">
+  <div class="modal-content" *ngIf="tutor" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-left">
+        <h2>{{ tutor.name }}</h2>
+        <button class="message-button" title="Message" (click)="$event.stopPropagation(); openChat()">
+          <svg class="chat-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H6L4 18V4H20V16Z" fill="currentColor"/>
+            <path d="M7 9H17V11H7V9ZM7 12H14V14H7V12Z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="header-right">
+        <!-- Average rating display (tutors only) -->
+        <div class="header-rating" *ngIf="tutor.rating !== undefined && tutor.rating !== null && tutor.rating > 0">
+          <span class="rating-badge">
+            <span class="stars-container">
+              <span class="star" *ngFor="let star of getStarsArray(tutor.rating)">⭐</span>
+              <span class="empty-star" *ngFor="let star of getEmptyStarsArray(tutor.rating)">☆</span>
+            </span>
+            <span class="rating-number">{{ tutor.rating | number:'1.1-1' }}/5</span>
+          </span>
+        </div>
+        <button class="close-button" (click)="$event.stopPropagation(); close()">×</button>
+      </div>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Profile Image and Bio Section - Side by Side -->
+      <div class="profile-section">
+        <div class="profile-image-container">
+          <ng-container *ngIf="tutor.profileImageUrl; else emojiFallback">
+            <img [src]="tutor.profileImageUrl" alt="Profile Image" class="profile-image" />
+          </ng-container>
+          <ng-template #emojiFallback>
+            <div class="user-emoji">
+              {{ tutor.userType === 'tutor' ? '👨‍🏫' : '👨‍🎓' }}
+            </div>
+          </ng-template>
+        </div>
+        
+        <div class="bio-section">
+          <h3>Bio:</h3>
+          <div class="bio-text" *ngIf="tutor.bio">
+            {{ tutor.bio }}
+          </div>
+          <div class="no-bio" *ngIf="!tutor.bio">
+            No bio available
+          </div>
+        </div>
+      </div>
+
+      <!-- Details Section - Bottom -->
+      <div class="details-section">
+        <h4>Profile Details</h4>
+        
+        <!-- Basic Info -->
+        <div class="info-fields-grid">
+          <div class="field" *ngIf="tutor.age">
+            <label class="field-label">Age</label>
+            <div class="preview-value">{{ tutor.age }}</div>
+          </div>
+
+          <div class="field" *ngIf="tutor.gender">
+            <label class="field-label">Gender</label>
+            <div class="preview-value">{{ tutor.gender }}</div>
+          </div>
+
+          <div class="field" *ngIf="tutor.education">
+            <label class="field-label">Education</label>
+            <div class="preview-value">{{ tutor.education }}</div>
+          </div>
+
+          <div class="field" *ngIf="tutor.timezone">
+            <label class="field-label">Time Zone</label>
+            <div class="preview-value">{{ tutor.timezone }}</div>
+          </div>
+
+          <div class="field">
+            <label class="field-label">Email</label>
+            <div class="preview-value">{{ tutor.email }}</div>
+          </div>
+          
+          <!-- Removed Total Sessions field -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
