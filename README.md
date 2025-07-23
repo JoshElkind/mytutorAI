@@ -29,7 +29,7 @@ MyTutor is a modern, full-stack tutoring platform designed to connect students a
 
 ## Demo Folder
 All demo videos and walkthroughs are available at:
-@https://loom.com/share/folder/da3e97a27a884e93a8658cdd61855d53
+https://loom.com/share/folder/da3e97a27a884e93a8658cdd61855d53
 
 ## Demo Screenshots
 <sub>homepage</sub>
