@@ -24,14 +24,8 @@ MyTutor is a modern, full-stack tutoring platform designed to connect students a
 - **Payments:** Stripe
 - **Hosting:** Azure
 
-## Getting Started
-1. **Clone the repository**
-2. **Install dependencies** for both frontend and backend
-3. **Set up environment variables** (see `.env.example` in each app)
-4. **Run database migrations and seed demo data**
-5. **Start backend and frontend servers**
 
-> Note: Backend and frontend are not currently hosted. For inquiries or access, please reach out to me.
+> Note: Backend and frontend are not currently hosted (taken down due to cost). For inquiries or access, please reach out to me.
 
 ## Demo Folder
 All demo videos and walkthroughs are available at:
