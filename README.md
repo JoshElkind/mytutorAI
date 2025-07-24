@@ -12,10 +12,8 @@ MyTutor is a modern, full-stack tutoring platform designed to connect students a
 - **AI-Powered Tools:**
   - Utilizes LangChain, Chroma vector DB, and Retrieval-Augmented Generation (RAG) to generate quizzes for tutors based on their uploaded learning resources.
   - The same stack is used to transcribe video call audio to text and automatically identify key feedback points for students to improve on.
-- **Caching:** Redis-backed caching for fast search and data retrieval.
-- **Role-Based Access:** Distinct flows and dashboards for students and tutors.
-- **Demo Data:** Preloaded lessons, offerings, sessions, reviews, and chat logs for demonstration purposes.
-
+- **Caching:** APACHE Kafka, Elasticsearch, and Redis-backed caching for fast search and data retrieval (chat-logs, searching marketplace, session data).
+  
 ## Tech Stack
 - **Frontend:** Angular (standalone components, SCSS, RxJS)
 - **Backend:** Ruby on Rails, GraphQL API, ActiveRecord, Redis, APACHE Kafka, Elasticsearch
