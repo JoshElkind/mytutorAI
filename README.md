@@ -23,7 +23,7 @@ MyTutor is a modern, full-stack tutoring platform designed to connect students a
 - **Hosting:** Azure
 
 
-> Note: Backend and frontend are not currently hosted (taken down due to cost). For inquiries or access, please reach out to me.
+> Note: Backend and Frontend are not currently hosted (taken down due to cost). For inquiries or access, please reach out to me.
 
 ## Demo Folder
 All demo videos and walkthroughs are available at:
